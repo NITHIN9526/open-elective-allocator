@@ -1,0 +1,21 @@
+<%- include("partials/header", { title }) %>
+</main>
+<div class="auth-layout role-auth-layout">
+  <div class="auth-hero"><div class="auth-hero-content">
+    <span class="eyebrow">STUDENT PORTAL</span><h1>Welcome,<br><em>Student</em></h1>
+    <p>Sign in with your Permanent Registration Number to manage elective preferences and track your allotment.</p>
+    <div class="auth-features"><div class="auth-feature">📚 Explore elective courses</div><div class="auth-feature">📋 Submit ranked preferences</div><div class="auth-feature">✅ View allotment status</div></div>
+  </div></div>
+  <div class="auth-panel-wrap"><div class="auth-card">
+    <h2>Student Login</h2><p class="muted text-sm">Enter your PRN and password.</p>
+    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+    <form method="post" action="/student/login" class="form-stack">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-group"><label class="form-label" for="student-prn">PRN</label><input id="student-prn" class="form-control" name="prn" autocomplete="username" required placeholder="Enter your PRN"></div>
+      <div class="form-group"><label class="form-label" for="student-password">Password</label><input id="student-password" class="form-control" type="password" name="password" autocomplete="current-password" required placeholder="Enter your password"></div>
+      <button class="btn btn-primary btn-full btn-lg" type="submit">Sign in as Student</button>
+    </form>
+    <div class="auth-bottom">New student? <a href="/register">Create your account →</a></div><div class="auth-bottom"><a href="/login">← Back to login selection</a></div>
+  </div></div>
+</div>
+<footer class="footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad</footer><script src="/app.js"></script></body></html>

@@ -41,41 +41,70 @@ function currentStudent(db, req) { return db.students.find(s => s.prn === req.se
 
 app.get("/", (req, res) => res.redirect(req.session.user ? (req.session.user.role === "STUDENT" ? "/student" : "/admin") : "/login"));
 
-app.get("/login", (req, res) => res.render("login", { title: "Sign in", error: null }));
-app.post("/login", loginLimiter, async (req, res) => {
-  const { prn, password } = req.body;
-  const id = String(prn || "").trim().toUpperCase();
-  const pass = String(password || "");
-  if (!id || !pass) return res.status(400).render("login", { title: "Sign in", error: "Enter your PRN/username and password." });
+app.get("/login", (req, res) => res.render("login", { title: "Choose login" }));
+
+function authenticateAccount(req, res, next, accountType) {
+  const isStudentLogin = accountType === "student";
+  const identifier = String(isStudentLogin ? req.body.prn || "" : req.body.username || "").trim();
+  const normalizedId = isStudentLogin ? identifier.toUpperCase() : identifier.toLowerCase();
+  const password = String(req.body.password || "");
+  const view = isStudentLogin ? "student-login" : "admin-login";
+  const title = isStudentLogin ? "Student login" : "Admin login";
+
+  if (!normalizedId || !password) {
+    return res.status(400).render(view, { title, error: "Enter your username and password." });
+  }
 
   const db = readDb();
-  const student = db.students.find(s => s.prn === id);
-  const admin = db.admins.find(a => a.username.toLowerCase() === id.toLowerCase() && a.active);
-  const account = student && student.passwordHash ? student : admin;
-  if (!account || !account.passwordHash || !(await bcrypt.compare(pass, account.passwordHash))) {
-    audit(db, id, "LOGIN_FAILED", "Invalid credentials");
-    writeDb(db);
-    return res.status(401).render("login", { title: "Sign in", error: "Invalid PRN/username or password." });
-  }
-  if (student && student.accountStatus !== "ACTIVE") {
-    const message = student.accountStatus === "PENDING" ? "Your account is awaiting administrator approval." : "Your student account is not active.";
-    return res.status(403).render("login", { title: "Sign in", error: message });
-  }
-  audit(db, student ? student.prn : admin.username, "LOGIN_SUCCESS", "Signed in");
-  writeDb(db);
+  const student = isStudentLogin
+    ? db.students.find(item => item.prn === normalizedId && item.passwordHash)
+    : null;
+  const admin = !isStudentLogin
+    ? db.admins.find(item => item.username.toLowerCase() === normalizedId && item.active)
+    : null;
+  const account = student || admin;
 
-  // Regenerate the session ID after authentication to prevent session fixation.
-  req.session.regenerate(err => {
-    if (err) return next(err);
-    req.session.user = student
-      ? { role: "STUDENT", prn: student.prn, name: student.name }
-      : { role: admin.role === "SUPER_ADMIN" ? "SUPER_ADMIN" : "ADMIN", username: admin.username, name: admin.name };
-    req.session.save(saveErr => {
-      if (saveErr) return next(saveErr);
-      res.redirect(student ? "/student" : "/admin");
+  (async () => {
+    if (!account || !account.passwordHash || !(await bcrypt.compare(password, account.passwordHash))) {
+      audit(db, normalizedId, "LOGIN_FAILED", "Invalid " + accountType + " credentials");
+      writeDb(db);
+      return res.status(401).render(view, {
+        title,
+        error: isStudentLogin ? "Invalid PRN or password." : "Invalid administrator username or password."
+      });
+    }
+
+    if (isStudentLogin && student.accountStatus !== "ACTIVE") {
+      const message = student.accountStatus === "PENDING"
+        ? "Your account is awaiting administrator approval."
+        : "Your student account is not active.";
+      return res.status(403).render(view, { title, error: message });
+    }
+
+    audit(db, isStudentLogin ? student.prn : admin.username, "LOGIN_SUCCESS", "Signed in through " + accountType + " login");
+    writeDb(db);
+
+    req.session.regenerate(err => {
+      if (err) return next(err);
+      req.session.user = isStudentLogin
+        ? { role: "STUDENT", prn: student.prn, name: student.name }
+        : { role: admin.role === "SUPER_ADMIN" ? "SUPER_ADMIN" : "ADMIN", username: admin.username, name: admin.name };
+      req.session.save(saveErr => {
+        if (saveErr) return next(saveErr);
+        res.redirect(isStudentLogin ? "/student" : "/admin");
+      });
     });
-  });
-});
+  })().catch(next);
+}
+
+app.get("/student/login", (req, res) => res.render("student-login", { title: "Student login", error: null }));
+app.post("/student/login", loginLimiter, (req, res, next) => authenticateAccount(req, res, next, "student"));
+
+app.get("/admin/login", (req, res) => res.render("admin-login", { title: "Admin login", error: null }));
+app.post("/admin/login", loginLimiter, (req, res, next) => authenticateAccount(req, res, next, "admin"));
+
+// Do not accept credentials at the generic login URL; it is only the role-selection page.
+app.post("/login", (req, res) => res.redirect(303, "/login"));
 
 app.get("/register", (req, res) => res.render("register", { title: "Student registration", error: null }));
 app.post("/register", loginLimiter, async (req, res) => {
