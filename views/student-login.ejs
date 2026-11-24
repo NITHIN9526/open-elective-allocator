@@ -1,27 +1,18 @@
 <%- include("partials/header", { title }) %>
 </main>
-<div class="oe-auth-page oe-form-page oe-student-login-compact">
+<div class="oe-auth-page oe-form-page oe-auth-single">
   <main class="oe-auth-shell">
-    <section class="oe-brand-side" aria-label="Open Elective Portal">
-      <div class="oe-brand-mark"><span>OE</span></div>
-      <i class="oe-decor oe-decor-one"></i><i class="oe-decor oe-decor-two"></i>
-    </section>
     <section class="oe-login-side">
       <div class="oe-login-content">
-        <p class="oe-login-kicker oe-form-login-kicker">OPEN ELECTIVE PORTAL · STUDENT</p>
+        <div class="oe-single-brand"><span>OE</span><strong>OPEN ELECTIVE PORTAL</strong></div>
+        <p class="oe-login-kicker oe-form-login-kicker">STUDENT PORTAL</p>
         <h2>Welcome back</h2>
         <p class="oe-login-subtitle">Sign in using your Permanent Registration Number and password.</p>
         <% if (error) { %><div class="oe-form-alert" role="alert"><%= error %></div><% } %>
         <form method="post" action="/student/login" class="oe-form-stack">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-          <div class="oe-form-group">
-            <label for="student-prn">PRN (Permanent Registration Number)</label>
-            <input id="student-prn" class="oe-form-control" name="prn" autocomplete="username" required placeholder="Enter your PRN">
-          </div>
-          <div class="oe-form-group">
-            <label for="student-password">Password</label>
-            <input id="student-password" class="oe-form-control" type="password" name="password" autocomplete="current-password" required placeholder="Enter your password">
-          </div>
+          <div class="oe-form-group"><label for="student-prn">PRN (Permanent Registration Number)</label><input id="student-prn" class="oe-form-control" name="prn" autocomplete="username" required placeholder="Enter your PRN"></div>
+          <div class="oe-form-group"><label for="student-password">Password</label><input id="student-password" class="oe-form-control" type="password" name="password" autocomplete="current-password" required placeholder="Enter your password"></div>
           <button class="oe-form-submit" type="submit">Sign in as Student <span aria-hidden="true">→</span></button>
         </form>
         <div class="oe-form-links"><a href="/login">← Back to home</a><a href="/register">New student? Create an account</a></div>
