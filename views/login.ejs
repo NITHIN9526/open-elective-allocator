@@ -1,46 +1,25 @@
 <%- include("partials/header", { title }) %>
-<% /* Auth pages use their own layout, so close the empty <main> from header and render auth-layout */ %>
 </main>
-<div class="auth-layout">
-  <div class="auth-hero">
-    <div class="auth-hero-content">
-      <span class="eyebrow">GOVERNMENT POLYTECHNIC COLLEGE, PALAKKAD</span>
-      <h1>Open Elective<br><em>Course Allocation</em></h1>
-      <p>Choose your elective preferences and track your provisional allotment through one simple portal.</p>
-      <div class="auth-features">
-        <div class="auth-feature"><span class="auth-feature-icon">🔐</span> PRN-based secure student access</div>
-        <div class="auth-feature"><span class="auth-feature-icon">📊</span> CGPA-based merit allocation</div>
-        <div class="auth-feature"><span class="auth-feature-icon">✅</span> Admin-reviewed final results</div>
-        <div class="auth-feature"><span class="auth-feature-icon">📋</span> Ranked preference submission</div>
-      </div>
-    </div>
+<section class="login-choice">
+  <div class="login-choice-heading">
+    <span class="eyebrow">GOVERNMENT POLYTECHNIC COLLEGE, PALAKKAD</span>
+    <h1>Open Elective Portal</h1>
+    <p>Select the portal you want to access.</p>
   </div>
-  <div class="auth-panel-wrap">
-    <div class="auth-card">
-      <h2>Welcome back</h2>
-      <p class="muted text-sm">Students sign in with their PRN. Administrators use their username.</p>
-      <% if (error) { %><div class="alert error"><%= error %></div><% } %>
-      <form method="post" action="/login" class="form-stack">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <div class="form-group">
-          <label class="form-label">PRN / Admin username</label>
-          <input class="form-control" name="prn" autocomplete="username" required placeholder="e.g. DEMO-CE-001 or admin">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input class="form-control" type="password" name="password" autocomplete="current-password" required placeholder="Enter your password">
-        </div>
-        <button class="btn btn-primary btn-full btn-lg">Sign in</button>
-      </form>
-      <div class="auth-bottom">New student? <a href="/register">Create your account →</a></div>
-      <div class="demo-box">
-        <strong>Demo credentials</strong><br>
-        Admin — username: <code>admin</code> · password: <code>Admin@12345</code><br>
-        Students — register at <code>/register</code> using a demo PRN
-      </div>
-    </div>
+  <div class="login-choice-grid">
+    <a class="login-choice-card student-choice" href="/student/login">
+      <span class="login-choice-icon">🎓</span><span class="login-choice-title">Student Login</span>
+      <span class="login-choice-description">Sign in with your PRN to submit elective preferences and view allotment results.</span>
+      <span class="login-choice-action">Continue as Student →</span>
+    </a>
+    <a class="login-choice-card admin-choice" href="/admin/login">
+      <span class="login-choice-icon">🛡️</span><span class="login-choice-title">Admin Login</span>
+      <span class="login-choice-description">Authorized administrators can manage students, courses, preferences and allotments.</span>
+      <span class="login-choice-action">Continue as Admin →</span>
+    </a>
   </div>
-</div>
+  <p class="login-choice-register">New student? <a href="/register">Create your account</a></p>
+</section>
 <footer class="footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad</footer>
 <script src="/app.js"></script>
 </body>
