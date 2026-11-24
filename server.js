@@ -16,7 +16,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET || "LOCAL-ONLY-CHANGE-ME-7d0c5
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(express.urlencoded({ extended: false, limit: "20kb" }));
+app.use(express.urlencoded({ extended: true, limit: "20kb", parameterLimit: 200 }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(session({
   name: "open_elective_sid",
