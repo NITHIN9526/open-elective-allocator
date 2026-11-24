@@ -61,12 +61,20 @@ app.post("/login", loginLimiter, async (req, res) => {
     const message = student.accountStatus === "PENDING" ? "Your account is awaiting administrator approval." : "Your student account is not active.";
     return res.status(403).render("login", { title: "Sign in", error: message });
   }
-  req.session.user = student
-    ? { role: "STUDENT", prn: student.prn, name: student.name }
-    : { role: admin.role === "SUPER_ADMIN" ? "SUPER_ADMIN" : "ADMIN", username: admin.username, name: admin.name };
   audit(db, student ? student.prn : admin.username, "LOGIN_SUCCESS", "Signed in");
   writeDb(db);
-  res.redirect(student ? "/student" : "/admin");
+
+  // Regenerate the session ID after authentication to prevent session fixation.
+  req.session.regenerate(err => {
+    if (err) return next(err);
+    req.session.user = student
+      ? { role: "STUDENT", prn: student.prn, name: student.name }
+      : { role: admin.role === "SUPER_ADMIN" ? "SUPER_ADMIN" : "ADMIN", username: admin.username, name: admin.name };
+    req.session.save(saveErr => {
+      if (saveErr) return next(saveErr);
+      res.redirect(student ? "/student" : "/admin");
+    });
+  });
 });
 
 app.get("/register", (req, res) => res.render("register", { title: "Student registration", error: null }));
@@ -220,6 +228,11 @@ app.post("/admin/courses/:id/capacity", requireAdmin, (req, res) => {
   const course = db.courses.find(c => c.id === req.params.id);
   const capacity = Number(req.body.capacity);
   if (!course || !Number.isInteger(capacity) || capacity < 1 || capacity > 500) { flash(req, "error", "Enter a valid capacity from 1 to 500."); return res.redirect("/admin/courses"); }
+  const currentlyAssigned = db.allotments.filter(a => a.courseId === course.id && ["PROPOSED", "APPROVED"].includes(a.status)).length;
+  if (capacity < currentlyAssigned) {
+    flash(req, "error", `Capacity cannot be lower than the ${currentlyAssigned} currently proposed or approved allotments.`);
+    return res.redirect("/admin/courses");
+  }
   course.capacity = capacity;
   audit(db, req.session.user.username, "COURSE_CAPACITY_CHANGED", `${course.id}: ${capacity}`);
   writeDb(db);
