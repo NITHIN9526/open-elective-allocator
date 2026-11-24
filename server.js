@@ -43,7 +43,8 @@ app.get("/", (req, res) => res.redirect(req.session.user ? (req.session.user.rol
 
 app.get("/login", (req, res) => {
   if (req.session.user) return res.redirect(req.session.user.role === "STUDENT" ? "/student" : "/admin");
-  res.render("landing", { title: "Open Elective Portal" });
+  const db = readDb();
+  res.render("landing", { title: "Open Elective Portal", stats: { departments: db.departments.length, courses: db.courses.length, students: db.students.length } });
 });
 
 function authenticateAccount(req, res, next, accountType) {

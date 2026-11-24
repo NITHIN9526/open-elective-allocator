@@ -1,44 +1,52 @@
 <%- include("partials/header", { title }) %>
 </main>
-<div class="auth-layout">
-  <div class="auth-hero">
-    <div class="auth-hero-content">
-      <span class="eyebrow">STUDENT REGISTRATION</span>
-      <h1>Create your<br><em>student account</em></h1>
-      <p>Use the PRN assigned in the roster. An administrator will review and approve your account before you can sign in.</p>
-      <div class="auth-features">
-        <div class="auth-feature"><span class="auth-feature-icon">1️⃣</span> Register with your PRN</div>
-        <div class="auth-feature"><span class="auth-feature-icon">2️⃣</span> Wait for admin approval</div>
-        <div class="auth-feature"><span class="auth-feature-icon">3️⃣</span> Sign in and submit preferences</div>
+<div class="oe-auth-page oe-form-page">
+  <main class="oe-auth-shell">
+    <section class="oe-brand-side">
+      <div class="oe-brand-mark"><span>OE</span></div>
+      <div class="oe-brand-copy oe-form-brand-copy">
+        <p class="oe-eyebrow">OPEN ELECTIVE PORTAL</p>
+        <h1>Your academic journey<br><span>starts here.</span></h1>
+        <div class="oe-brand-rule"></div>
+        <p class="oe-brand-description">Create your student account to take part in the elective course allocation process at Government Polytechnic College, Palakkad.</p>
+        <div class="oe-form-side-list">
+          <div class="oe-form-side-item"><span>01</span> Register using your assigned PRN</div>
+          <div class="oe-form-side-item"><span>02</span> Wait for administrator approval</div>
+          <div class="oe-form-side-item"><span>03</span> Sign in to submit your preferences</div>
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="auth-panel-wrap">
-    <div class="auth-card">
-      <h2>Student registration</h2>
-      <p class="muted text-sm">Your name, department and CGPA are loaded from the roster.</p>
-      <% if (error) { %><div class="alert error"><%= error %></div><% } %>
-      <form method="post" action="/register" class="form-stack">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <div class="form-group">
-          <label class="form-label">PRN (Permanent Registration Number)</label>
-          <input class="form-control" name="prn" required placeholder="e.g. DEMO-CE-001">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Create password</label>
-          <input class="form-control" type="password" name="password" minlength="10" maxlength="72" required placeholder="At least 10 characters">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Confirm password</label>
-          <input class="form-control" type="password" name="confirmPassword" minlength="10" maxlength="72" required placeholder="Re-enter your password">
-        </div>
-        <button class="btn btn-primary btn-full btn-lg">Submit registration</button>
-      </form>
-      <div class="auth-bottom"><a href="/login">← Back to sign in</a></div>
-    </div>
-  </div>
+      <div class="oe-brand-bottom"><span class="oe-status-dot"></span> Student registration · Secure access</div>
+      <i class="oe-decor oe-decor-one"></i><i class="oe-decor oe-decor-two"></i>
+    </section>
+    <section class="oe-login-side">
+      <div class="oe-login-content">
+        <p class="oe-login-kicker oe-form-login-kicker">STUDENT ACCOUNT</p>
+        <h2>Create your account</h2>
+        <p class="oe-login-subtitle">Enter your PRN and choose a secure password. Your roster details will be loaded automatically.</p>
+        <% if (error) { %><div class="oe-form-alert" role="alert"><%= error %></div><% } %>
+        <form method="post" action="/register" class="oe-form-stack">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="oe-form-group">
+            <label for="register-prn">PRN (Permanent Registration Number)</label>
+            <input id="register-prn" class="oe-form-control" name="prn" autocomplete="username" required placeholder="Enter your assigned PRN">
+          </div>
+          <div class="oe-form-group">
+            <label for="register-password">Create password</label>
+            <input id="register-password" class="oe-form-control" type="password" name="password" minlength="10" maxlength="72" autocomplete="new-password" required placeholder="At least 10 characters">
+          </div>
+          <div class="oe-form-group">
+            <label for="register-confirm-password">Confirm password</label>
+            <input id="register-confirm-password" class="oe-form-control" type="password" name="confirmPassword" minlength="10" maxlength="72" autocomplete="new-password" required placeholder="Re-enter your password">
+          </div>
+          <button class="oe-form-submit" type="submit">Submit registration <span aria-hidden="true">→</span></button>
+        </form>
+        <div class="oe-form-note">Your account will remain pending until an administrator reviews and approves it.</div>
+        <div class="oe-form-links"><a href="/login">← Back to home</a><a href="/student/login">Already registered? Sign in</a></div>
+      </div>
+      <div class="oe-login-footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad</div>
+    </section>
+  </main>
 </div>
-<footer class="footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad</footer>
 <script src="/app.js"></script>
 </body>
 </html>
