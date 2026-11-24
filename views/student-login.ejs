@@ -1,21 +1,47 @@
 <%- include("partials/header", { title }) %>
 </main>
-<div class="auth-layout role-auth-layout">
-  <div class="auth-hero"><div class="auth-hero-content">
-    <span class="eyebrow">STUDENT PORTAL</span><h1>Welcome,<br><em>Student</em></h1>
-    <p>Sign in with your Permanent Registration Number to manage elective preferences and track your allotment.</p>
-    <div class="auth-features"><div class="auth-feature">📚 Explore elective courses</div><div class="auth-feature">📋 Submit ranked preferences</div><div class="auth-feature">✅ View allotment status</div></div>
-  </div></div>
-  <div class="auth-panel-wrap"><div class="auth-card">
-    <h2>Student Login</h2><p class="muted text-sm">Enter your PRN and password.</p>
-    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
-    <form method="post" action="/student/login" class="form-stack">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <div class="form-group"><label class="form-label" for="student-prn">PRN</label><input id="student-prn" class="form-control" name="prn" autocomplete="username" required placeholder="Enter your PRN"></div>
-      <div class="form-group"><label class="form-label" for="student-password">Password</label><input id="student-password" class="form-control" type="password" name="password" autocomplete="current-password" required placeholder="Enter your password"></div>
-      <button class="btn btn-primary btn-full btn-lg" type="submit">Sign in as Student</button>
-    </form>
-    <div class="auth-bottom">New student? <a href="/register">Create your account →</a></div><div class="auth-bottom"><a href="/login">← Back to login selection</a></div>
-  </div></div>
+<div class="oe-auth-page oe-form-page">
+  <main class="oe-auth-shell">
+    <section class="oe-brand-side">
+      <div class="oe-brand-mark"><span>OE</span></div>
+      <div class="oe-brand-copy oe-form-brand-copy">
+        <p class="oe-eyebrow">OPEN ELECTIVE PORTAL</p>
+        <h1>Shape your learning.<br><span>Choose your future.</span></h1>
+        <div class="oe-brand-rule"></div>
+        <p class="oe-brand-description">Access your elective portal to review available courses, submit your preferences and follow your allotment status.</p>
+        <div class="oe-form-side-list">
+          <div class="oe-form-side-item"><span>01</span> Explore available elective courses</div>
+          <div class="oe-form-side-item"><span>02</span> Submit your ranked preferences</div>
+          <div class="oe-form-side-item"><span>03</span> Check your allotment status</div>
+        </div>
+      </div>
+      <div class="oe-brand-bottom"><span class="oe-status-dot"></span> Student portal · Secure sign in</div>
+      <i class="oe-decor oe-decor-one"></i><i class="oe-decor oe-decor-two"></i>
+    </section>
+    <section class="oe-login-side">
+      <div class="oe-login-content">
+        <p class="oe-login-kicker oe-form-login-kicker">STUDENT PORTAL</p>
+        <h2>Welcome back</h2>
+        <p class="oe-login-subtitle">Sign in using your Permanent Registration Number and password.</p>
+        <% if (error) { %><div class="oe-form-alert" role="alert"><%= error %></div><% } %>
+        <form method="post" action="/student/login" class="oe-form-stack">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="oe-form-group">
+            <label for="student-prn">PRN (Permanent Registration Number)</label>
+            <input id="student-prn" class="oe-form-control" name="prn" autocomplete="username" required placeholder="Enter your PRN">
+          </div>
+          <div class="oe-form-group">
+            <label for="student-password">Password</label>
+            <input id="student-password" class="oe-form-control" type="password" name="password" autocomplete="current-password" required placeholder="Enter your password">
+          </div>
+          <button class="oe-form-submit" type="submit">Sign in as Student <span aria-hidden="true">→</span></button>
+        </form>
+        <div class="oe-form-links"><a href="/login">← Back to home</a><a href="/register">New student? Create an account</a></div>
+      </div>
+      <div class="oe-login-footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad</div>
+    </section>
+  </main>
 </div>
-<footer class="footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad</footer><script src="/app.js"></script></body></html>
+<script src="/app.js"></script>
+</body>
+</html>
