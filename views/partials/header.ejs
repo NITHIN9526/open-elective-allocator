@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> · Open Elective</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+
+<% const isAdmin = user && ['ADMIN','SUPER_ADMIN'].includes(user.role); %>
+<% const isStudent = user && user.role === 'STUDENT'; %>
+
+<body class="<%= isAdmin ? 'has-sidebar' : '' %>">
+
+<% if (isAdmin) { %>
+  <!-- Admin Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo">OE</div>
+      <span>Open Elective<small>Admin Portal</small></span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">Main</div>
+      <a href="/admin" class="<%= currentPath === '/admin' ? 'active' : '' %>">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="/admin/students" class="<%= currentPath === '/admin/students' ? 'active' : '' %>">
+        <span class="nav-icon">👥</span> Students
+      </a>
+      <a href="/admin/courses" class="<%= currentPath === '/admin/courses' ? 'active' : '' %>">
+        <span class="nav-icon">📚</span> Courses
+      </a>
+      <div class="sidebar-section">Allocation</div>
+      <a href="/admin/preferences" class="<%= currentPath === '/admin/preferences' ? 'active' : '' %>">
+        <span class="nav-icon">📋</span> Preferences
+      </a>
+      <a href="/admin/allotments" class="<%= currentPath === '/admin/allotments' ? 'active' : '' %>">
+        <span class="nav-icon">🏷️</span> Allotments
+      </a>
+      <a href="/admin/audit" class="<%= currentPath === '/admin/audit' ? 'active' : '' %>">
+        <span class="nav-icon">📜</span> Audit Log
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <form method="post" action="/logout" class="inline">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-secondary btn-full btn-sm">Sign out</button>
+      </form>
+    </div>
+  </aside>
+  <div class="sidebar-overlay"></div>
+  <div class="main-area">
+    <!-- Admin Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" aria-label="Toggle menu">☰</button>
+        <span class="topbar-title"><%= title %></span>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-user">Signed in as <strong><%= user.name || user.username %></strong></span>
+      </div>
+    </header>
+
+<% } else if (isStudent) { %>
+  <!-- Student Top Bar -->
+  <header class="brand-bar">
+    <a class="brand-link" href="/">
+      <span class="brand-mark">OE</span>
+      <span class="brand-text">Open Elective<small>Student Portal</small></span>
+    </a>
+    <nav class="brand-nav">
+      <a href="/student">Dashboard</a>
+      <a href="/student/result">My Result</a>
+      <form method="post" action="/logout" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="nav-logout">Sign out</button></form>
+    </nav>
+  </header>
+
+<% } else { %>
+  <!-- Public Top Bar (login/register) -->
+  <% /* No header for auth pages — handled by auth-layout */ %>
+<% } %>
+
+<main class="container">
+  <% if (flash) { %>
+    <div class="alert <%= flash.type %>"><%= flash.message %></div>
+  <% } %>

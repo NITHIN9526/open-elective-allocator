@@ -1,0 +1,7 @@
+</main>
+<footer class="footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad · Local demonstration</footer>
+<% const isAdminFooter = user && ['ADMIN','SUPER_ADMIN'].includes(user.role); %>
+<% if (isAdminFooter) { %></div><!-- .main-area --><% } %>
+<script src="/app.js"></script>
+</body>
+</html>

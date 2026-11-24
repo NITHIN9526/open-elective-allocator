@@ -1,0 +1,51 @@
+<%- include("partials/header", { title }) %>
+
+<div class="page-heading">
+  <span class="eyebrow">ADMINISTRATION</span>
+  <h1>Course Management</h1>
+  <p class="text-muted">Review elective courses and edit seat capacity.</p>
+</div>
+
+<div class="course-admin-grid">
+  <% courses.forEach(c => { %>
+  <div class="card course-admin-card">
+    <div class="card-body">
+      <span class="course-code"><%= c.id %></span>
+      <h3><%= c.name %></h3>
+      <span class="text-xs text-muted">Offered by <%= c.offeredBy %></span>
+
+      <div class="capacity-row">
+        <div class="capacity-num">
+          <span>Allocated</span>
+          <strong><%= c.used %></strong>
+        </div>
+        <div class="capacity-num">
+          <span>Capacity</span>
+          <strong><%= c.capacity %></strong>
+        </div>
+        <div class="capacity-num">
+          <span>Remaining</span>
+          <strong style="color: <%= c.remaining > 0 ? 'var(--success)' : 'var(--danger)' %>"><%= c.remaining %></strong>
+        </div>
+      </div>
+
+      <div class="progress-track" style="margin-bottom:8px;">
+        <% const usagePct = c.capacity > 0 ? Math.round((c.used / c.capacity) * 100) : 0; %>
+        <div class="progress-fill <%= usagePct >= 90 ? 'red' : usagePct >= 60 ? 'amber' : '' %>" style="width:<%= usagePct %>%"></div>
+      </div>
+      <span class="text-xs text-muted"><%= usagePct %>% utilized</span>
+
+      <form method="post" action="/admin/courses/<%= c.id %>/capacity" class="form-row mt-md">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">Seat limit</label>
+          <input class="form-control" type="number" name="capacity" min="1" max="500" value="<%= c.capacity %>">
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px;">Update</button>
+      </form>
+    </div>
+  </div>
+  <% }) %>
+</div>
+
+<%- include("partials/footer") %>

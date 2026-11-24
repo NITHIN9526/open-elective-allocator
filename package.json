@@ -1,0 +1,21 @@
+{
+  "name": "open-elective-local-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local demo portal for open-elective preference submission and merit-based allocation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "reset-demo": "node scripts/reset-demo.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0"
+  }
+}

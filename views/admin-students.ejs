@@ -1,0 +1,38 @@
+<%- include("partials/header", { title }) %>
+
+<div class="heading-row">
+  <div class="page-heading">
+    <span class="eyebrow">ADMINISTRATION</span>
+    <h1>Student Management</h1>
+    <p class="text-muted">Complete roster and registration status.</p>
+  </div>
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="Search students..." data-search-target="students-table">
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body flush">
+    <div class="table-wrap">
+      <table id="students-table">
+        <thead>
+          <tr><th>PRN</th><th>Name</th><th>Department</th><th>CGPA</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <% students.forEach(s => { %>
+          <tr>
+            <td><code style="font-size:12px;background:var(--gray-100);padding:3px 7px;border-radius:4px;"><%= s.prn %></code></td>
+            <td><strong><%= s.name %></strong></td>
+            <td><%= s.department %></td>
+            <td><%= Number(s.cgpa).toFixed(2) %></td>
+            <td><span class="badge <%= s.accountStatus === 'ACTIVE' ? 'badge-success' : s.accountStatus === 'PENDING' ? 'badge-warning' : s.accountStatus === 'REJECTED' ? 'badge-danger' : 'badge-gray' %>"><%= s.accountStatus %></span></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

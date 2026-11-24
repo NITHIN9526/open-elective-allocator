@@ -1,0 +1,44 @@
+<%- include("partials/header", { title }) %>
+</main>
+<div class="auth-layout">
+  <div class="auth-hero">
+    <div class="auth-hero-content">
+      <span class="eyebrow">STUDENT REGISTRATION</span>
+      <h1>Create your<br><em>student account</em></h1>
+      <p>Use the PRN assigned in the roster. An administrator will review and approve your account before you can sign in.</p>
+      <div class="auth-features">
+        <div class="auth-feature"><span class="auth-feature-icon">1️⃣</span> Register with your PRN</div>
+        <div class="auth-feature"><span class="auth-feature-icon">2️⃣</span> Wait for admin approval</div>
+        <div class="auth-feature"><span class="auth-feature-icon">3️⃣</span> Sign in and submit preferences</div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-panel-wrap">
+    <div class="auth-card">
+      <h2>Student registration</h2>
+      <p class="muted text-sm">Your name, department and CGPA are loaded from the roster.</p>
+      <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+      <form method="post" action="/register" class="form-stack">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-group">
+          <label class="form-label">PRN (Permanent Registration Number)</label>
+          <input class="form-control" name="prn" required placeholder="e.g. DEMO-CE-001">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Create password</label>
+          <input class="form-control" type="password" name="password" minlength="10" maxlength="72" required placeholder="At least 10 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm password</label>
+          <input class="form-control" type="password" name="confirmPassword" minlength="10" maxlength="72" required placeholder="Re-enter your password">
+        </div>
+        <button class="btn btn-primary btn-full btn-lg">Submit registration</button>
+      </form>
+      <div class="auth-bottom"><a href="/login">← Back to sign in</a></div>
+    </div>
+  </div>
+</div>
+<footer class="footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad</footer>
+<script src="/app.js"></script>
+</body>
+</html>

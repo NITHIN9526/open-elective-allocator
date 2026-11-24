@@ -1,0 +1,105 @@
+<%- include("partials/header", { title }) %>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-row">
+    <div>
+      <span class="eyebrow">STUDENT PORTAL</span>
+      <h1>Welcome, <%= student.name %></h1>
+      <p><%= student.prn %> · <%= student.department %> · Semester <%= student.semester %></p>
+    </div>
+    <span class="badge badge-success">Account active</span>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-row three">
+  <div class="stat-card blue">
+    <div class="stat-icon">🏛️</div>
+    <div class="stat-info">
+      <span class="stat-value"><%= student.department %></span>
+      <span class="stat-label">Department</span>
+    </div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-icon">📊</div>
+    <div class="stat-info">
+      <span class="stat-value"><%= Number(student.cgpa).toFixed(2) %></span>
+      <span class="stat-label">Verified CGPA</span>
+    </div>
+  </div>
+  <div class="stat-card <%= preferencesOpen ? 'green' : 'amber' %>">
+    <div class="stat-icon"><%= preferencesOpen ? '🟢' : '🔴' %></div>
+    <div class="stat-info">
+      <span class="stat-value"><%= preferencesOpen ? 'Open' : 'Closed' %></span>
+      <span class="stat-label">Preference Window</span>
+    </div>
+  </div>
+</div>
+
+<!-- Course Preferences Form -->
+<div class="card mb-md">
+  <div class="card-header">
+    <h2>Course Preferences</h2>
+    <span class="text-muted text-xs">Assign unique priority numbers · Preference 1 = highest</span>
+  </div>
+  <div class="card-body">
+    <% if (preferencesOpen) { %>
+    <form method="post" action="/student/preferences">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="course-grid">
+        <% courses.forEach(course => { const selected = preferences.find(p => p.courseId === course.id); %>
+        <div class="course-card <%= selected ? 'selected' : '' %>">
+          <span class="course-code"><%= course.id %></span>
+          <div class="course-name"><%= course.name %></div>
+          <div class="course-desc"><%= course.description %></div>
+          <div class="course-meta">Offered by <%= course.offeredBy %> · <%= course.capacity %> seats</div>
+          <div class="course-rank-select">
+            <select name="ranks[<%= course.id %>]" class="form-control">
+              <option value="">Not selected</option>
+              <% for (let rank = 1; rank <= config.maxPreferences; rank++) { %>
+                <option value="<%= rank %>" <%= selected && selected.rank === rank ? "selected" : "" %>>Preference <%= rank %></option>
+              <% } %>
+            </select>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+      <p class="text-muted text-xs mt-md">Choose unique priority numbers. Leave other courses as "Not selected". Maximum <%= config.maxPreferences %> courses.</p>
+      <div class="mt-md">
+        <button class="btn btn-primary btn-lg">Save preferences</button>
+      </div>
+    </form>
+    <% } else { %>
+      <div class="alert info">Preference submission is currently closed. Contact the administrator if you need assistance.</div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Saved Preferences -->
+<div class="card">
+  <div class="card-header"><h2>Your Saved Preferences</h2></div>
+  <div class="card-body flush">
+    <% if (!preferences.length) { %>
+      <div class="empty">You have not submitted any preferences yet.</div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Priority</th><th>Course</th><th>Course ID</th><th>Offered By</th></tr></thead>
+          <tbody>
+            <% preferences.forEach(p => { const c = courses.find(x => x.id === p.courseId); %>
+            <tr>
+              <td><span class="rank-badge">#<%= p.rank %></span></td>
+              <td><strong><%= c ? c.name : p.courseId %></strong></td>
+              <td><%= p.courseId %></td>
+              <td><%= c ? c.offeredBy : '—' %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

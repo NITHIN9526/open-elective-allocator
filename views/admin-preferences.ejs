@@ -1,0 +1,32 @@
+<%- include("partials/header", { title }) %>
+
+<div class="page-heading">
+  <span class="eyebrow">ADMINISTRATION</span>
+  <h1>Student Preferences</h1>
+  <p class="text-muted">Preferences submitted by active students.</p>
+</div>
+
+<% if (!rows.length) { %>
+  <div class="card"><div class="empty">No preferences have been submitted yet.</div></div>
+<% } else { %>
+  <% rows.forEach(row => { %>
+  <div class="card pref-card">
+    <div class="card-body">
+      <div class="pref-card-top">
+        <div>
+          <strong><%= row.student.name %></strong>
+          <small><%= row.student.prn %> · <%= row.student.department %> · CGPA <%= Number(row.student.cgpa).toFixed(2) %></small>
+        </div>
+        <span class="badge <%= row.student.accountStatus === 'ACTIVE' ? 'badge-success' : 'badge-warning' %>"><%= row.student.accountStatus %></span>
+      </div>
+      <ol class="pref-list">
+        <% row.preferences.forEach(p => { %>
+        <li><%= p.course ? p.course.name : p.courseId %> <span class="text-xs text-muted">(<%= p.courseId %>)</span></li>
+        <% }) %>
+      </ol>
+    </div>
+  </div>
+  <% }) %>
+<% } %>
+
+<%- include("partials/footer") %>

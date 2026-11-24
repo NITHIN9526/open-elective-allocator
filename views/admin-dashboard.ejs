@@ -1,0 +1,205 @@
+<%- include("partials/header", { title }) %>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-row">
+    <div>
+      <span class="eyebrow">ADMINISTRATION</span>
+      <h1>Dashboard</h1>
+      <p><%= config.collegeName %> · Academic Year <%= config.academicYear %></p>
+    </div>
+    <span class="badge badge-purple">Semester <%= config.semester %></span>
+  </div>
+</div>
+
+<!-- KPI Stat Cards -->
+<div class="stats-row">
+  <div class="stat-card blue">
+    <div class="stat-icon">👥</div>
+    <div class="stat-info">
+      <span class="stat-value" data-count="<%= stats.totalStudents %>"><%= stats.totalStudents %></span>
+      <span class="stat-label">Total Students</span>
+      <span class="stat-sub"><%= stats.registered %> registered</span>
+    </div>
+  </div>
+  <div class="stat-card amber">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-info">
+      <span class="stat-value" data-count="<%= stats.pending %>"><%= stats.pending %></span>
+      <span class="stat-label">Pending Approvals</span>
+      <span class="stat-sub">Awaiting review</span>
+    </div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon">✅</div>
+    <div class="stat-info">
+      <span class="stat-value" data-count="<%= stats.active %>"><%= stats.active %></span>
+      <span class="stat-label">Active Accounts</span>
+      <span class="stat-sub"><%= stats.studentsWithPrefs %> submitted prefs</span>
+    </div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-icon">📝</div>
+    <div class="stat-info">
+      <span class="stat-value" data-count="<%= stats.totalPreferences %>"><%= stats.totalPreferences %></span>
+      <span class="stat-label">Total Preferences</span>
+      <span class="stat-sub"><%= stats.allotted %> allotted</span>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard Grid -->
+<div class="dashboard-grid">
+  <!-- Left Column -->
+  <div class="dashboard-main">
+
+    <!-- Department Overview -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Department Overview</h2>
+        <span class="badge badge-gray"><%= deptStats.length %> departments</span>
+      </div>
+      <div class="card-body">
+        <% deptStats.forEach(dept => { const pct = dept.total > 0 ? Math.round((dept.active / dept.total) * 100) : 0; %>
+        <div class="dept-row">
+          <div class="dept-row-top">
+            <span class="dept-name"><%= dept.name %> <span class="text-muted text-xs">(<%= dept.code %>)</span></span>
+            <div class="dept-badges">
+              <span class="dept-mini-badge active"><%= dept.active %> active</span>
+              <% if (dept.pending) { %><span class="dept-mini-badge pending"><%= dept.pending %> pending</span><% } %>
+              <% if (dept.prefsSubmitted) { %><span class="dept-mini-badge prefs"><%= dept.prefsSubmitted %> prefs</span><% } %>
+            </div>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill green" style="width:<%= pct %>%"></div>
+          </div>
+          <div class="text-xs text-muted mt-sm"><%= dept.active %> of <%= dept.total %> students active (<%= pct %>%)</div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- Course Demand -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Course Demand</h2>
+        <span class="text-muted text-xs">Preference counts &amp; capacity usage</span>
+      </div>
+      <div class="card-body flush">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Course</th><th>Dept</th><th>1st Choice</th><th>Total Prefs</th><th>Seated</th><th>Capacity</th><th style="min-width:120px">Utilization</th></tr>
+            </thead>
+            <tbody>
+              <% courseStats.forEach(c => { %>
+              <tr>
+                <td><strong><%= c.name %></strong><small><%= c.id %></small></td>
+                <td><%= c.offeredBy %></td>
+                <td><span class="rank-badge"><%= c.firstChoice %></span></td>
+                <td><%= c.totalPrefs %></td>
+                <td><%= c.seated %></td>
+                <td><%= c.capacity %></td>
+                <td>
+                  <div class="progress-track" style="margin-bottom:4px">
+                    <div class="progress-fill <%= c.utilization >= 90 ? 'red' : c.utilization >= 60 ? 'amber' : 'blue' %>" style="width:<%= c.utilization %>%"></div>
+                  </div>
+                  <span class="text-xs text-muted"><%= c.utilization %>%</span>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Approvals -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Pending Approvals</h2>
+        <a href="/admin/students" class="btn btn-ghost btn-sm">All students →</a>
+      </div>
+      <div class="card-body">
+        <% if (!pending.length) { %>
+          <div class="empty">No pending registrations 🎉</div>
+        <% } else { %>
+          <% pending.forEach(s => { %>
+          <div class="approval-item">
+            <div class="approval-info">
+              <strong><%= s.name %></strong>
+              <small><%= s.prn %> · <%= s.department %> · CGPA <%= Number(s.cgpa).toFixed(2) %></small>
+            </div>
+            <div class="approval-actions">
+              <form method="post" action="/admin/students/<%= encodeURIComponent(s.prn) %>/approve"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-success btn-sm">Approve</button></form>
+              <form method="post" action="/admin/students/<%= encodeURIComponent(s.prn) %>/reject"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-danger btn-sm">Reject</button></form>
+            </div>
+          </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Column -->
+  <div class="dashboard-aside">
+
+    <!-- Allocation Controls -->
+    <div class="card">
+      <div class="card-header"><h2>Allocation Controls</h2></div>
+      <div class="card-body">
+        <div class="control-row">
+          <span class="control-label">Preference window</span>
+          <span class="badge <%= db.meta.preferencesOpen ? 'badge-success' : 'badge-danger' %>"><%= db.meta.preferencesOpen ? 'OPEN' : 'CLOSED' %></span>
+        </div>
+        <div class="control-row">
+          <span class="control-label">Allocation status</span>
+          <span class="badge badge-info"><%= db.meta.allocationStatus %></span>
+        </div>
+        <div class="mt-md" style="display:grid;gap:10px;">
+          <form method="post" action="/admin/preferences/toggle"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-secondary btn-full"><%= db.meta.preferencesOpen ? '🔒 Close preferences' : '🔓 Reopen preferences' %></button></form>
+          <form method="post" action="/admin/allocation/run" onsubmit="return confirm('Generate provisional allotments? Existing results will be replaced.');"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-primary btn-full" <%= db.meta.preferencesOpen ? 'disabled' : '' %>>⚡ Run merit allocation</button></form>
+          <a class="btn btn-secondary btn-full" href="/admin/allotments">📊 Review allotments</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="card">
+      <div class="card-header"><h2>Quick Actions</h2></div>
+      <div class="card-body" style="padding:8px 10px;">
+        <div class="action-list">
+          <a href="/admin/students" class="action-link"><span class="action-icon">👥</span> Manage students <span class="action-arrow">→</span></a>
+          <a href="/admin/courses" class="action-link"><span class="action-icon">📚</span> Edit course capacity <span class="action-arrow">→</span></a>
+          <a href="/admin/preferences" class="action-link"><span class="action-icon">📋</span> View all preferences <span class="action-arrow">→</span></a>
+          <a href="/admin/audit" class="action-link"><span class="action-icon">📜</span> Full audit log <span class="action-arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Recent Activity</h2>
+        <a href="/admin/audit" class="btn btn-ghost btn-sm">View all</a>
+      </div>
+      <div class="card-body">
+        <% if (!recentAudit.length) { %>
+          <div class="empty text-sm">No activity yet.</div>
+        <% } else { %>
+          <% recentAudit.slice(0, 8).forEach(entry => { %>
+          <div class="activity-item">
+            <div class="activity-action"><%= entry.action.replace(/_/g, ' ') %></div>
+            <div class="activity-detail"><%= entry.actor %><% if (entry.details) { %> — <%= entry.details %><% } %></div>
+            <div class="activity-time"><%= new Date(entry.at).toLocaleString() %></div>
+          </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<%- include("partials/footer") %>
