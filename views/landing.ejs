@@ -1,39 +1,49 @@
 <%- include("partials/header", { title }) %>
 </main>
-<section class="oe-landing">
-  <div class="oe-intro">
-    <div class="oe-logo" aria-hidden="true"><span>OE</span><i>✦</i></div>
-    <h1>Open Elective Portal</h1>
-    <h2>Government Polytechnic College, Palakkad</h2>
-    <p class="oe-tagline">A Simple and Transparent Course Allocation System</p>
-    <p class="oe-description">Explore elective courses, submit your preferences and track your allotment in one place.</p>
-  </div>
-  <section class="oe-student-panel" aria-labelledby="student-login-heading">
-    <div class="oe-panel-heading">
-      <div class="oe-role-icon student-icon">♧</div>
-      <div><h2 id="student-login-heading">Student Login <span class="oe-most-used">MOST USED</span></h2>
-      <p>Access your elective courses and allocation dashboard</p></div>
+<section class="oe-auth-page">
+  <div class="oe-auth-shell">
+    <div class="oe-brand-side">
+      <div class="oe-brand-mark" aria-hidden="true"><span>OE</span></div>
+      <div class="oe-brand-copy">
+        <p class="oe-eyebrow">GOVERNMENT POLYTECHNIC COLLEGE · PALAKKAD</p>
+        <h1>Open Elective<br><span>Portal</span></h1>
+        <div class="oe-brand-rule"></div>
+        <p class="oe-brand-description">A simple and transparent way to explore elective courses, submit your preferences and view your course allocation.</p>
+      </div>
+      <div class="oe-brand-bottom">
+        <span class="oe-status-dot"></span>
+        <span>Student elective allocation system</span>
+      </div>
+      <div class="oe-decor oe-decor-one"></div><div class="oe-decor oe-decor-two"></div>
     </div>
-    <a class="oe-student-button" href="/student/login">Sign In as Student <span>→</span></a>
-    <div class="oe-stats">
-      <div><strong><%= stats.departments %>+</strong><small>Departments</small></div>
-      <div><strong><%= stats.courses %>+</strong><small>Elective Courses</small></div>
-      <div><strong><%= stats.students %>+</strong><small>Students</small></div>
+
+    <div class="oe-login-side">
+      <div class="oe-login-content">
+        <div class="oe-mobile-mark">OE</div>
+        <p class="oe-login-kicker">WELCOME</p>
+        <h2>Sign in to continue</h2>
+        <p class="oe-login-subtitle">Choose your account type to access the portal.</p>
+
+        <a class="oe-login-option oe-student-option" href="/student/login">
+          <span class="oe-option-icon">S</span>
+          <span class="oe-option-copy"><strong>Student Login</strong><small>Access your elective preferences and allotment</small></span>
+          <span class="oe-option-arrow">→</span>
+        </a>
+
+        <a class="oe-login-option oe-admin-option" href="/admin/login">
+          <span class="oe-option-icon">A</span>
+          <span class="oe-option-copy"><strong>Admin Login</strong><small>Manage courses, students and allocations</small></span>
+          <span class="oe-option-arrow">→</span>
+        </a>
+
+        <div class="oe-register-line">
+          <span>New student?</span>
+          <a href="/register">Create an account <span>↗</span></a>
+        </div>
+      </div>
+      <footer class="oe-login-footer">© <%= new Date().getFullYear() %> Open Elective Portal</footer>
     </div>
-  </section>
-  <div class="oe-register">
-    <p>New student? Create your account</p>
-    <a href="/register"><span>♙</span> Register Now <b>›</b></a>
   </div>
-  <section class="oe-admin-grid oe-single-admin" aria-label="Admin login">
-    <a class="oe-admin-card admin-card" href="/admin/login">
-      <span class="oe-admin-icon">▥</span>
-      <h2>Admin Login</h2>
-      <p>Manage students, departments, elective courses and the allocation process</p>
-      <strong>Continue <span>→</span></strong>
-    </a>
-  </section>
-  <footer class="oe-footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad</footer>
 </section>
 <script src="/app.js"></script>
 </body></html>
