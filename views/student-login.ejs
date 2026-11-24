@@ -1,26 +1,14 @@
 <%- include("partials/header", { title }) %>
 </main>
-<div class="oe-auth-page oe-form-page">
+<div class="oe-auth-page oe-form-page oe-student-login-compact">
   <main class="oe-auth-shell">
-    <section class="oe-brand-side">
+    <section class="oe-brand-side" aria-label="Open Elective Portal">
       <div class="oe-brand-mark"><span>OE</span></div>
-      <div class="oe-brand-copy oe-form-brand-copy">
-        <p class="oe-eyebrow">OPEN ELECTIVE PORTAL</p>
-        <h1>Shape your learning.<br><span>Choose your future.</span></h1>
-        <div class="oe-brand-rule"></div>
-        <p class="oe-brand-description">Access your elective portal to review available courses, submit your preferences and follow your allotment status.</p>
-        <div class="oe-form-side-list">
-          <div class="oe-form-side-item"><span>01</span> Explore available elective courses</div>
-          <div class="oe-form-side-item"><span>02</span> Submit your ranked preferences</div>
-          <div class="oe-form-side-item"><span>03</span> Check your allotment status</div>
-        </div>
-      </div>
-      <div class="oe-brand-bottom"><span class="oe-status-dot"></span> Student portal · Secure sign in</div>
       <i class="oe-decor oe-decor-one"></i><i class="oe-decor oe-decor-two"></i>
     </section>
     <section class="oe-login-side">
       <div class="oe-login-content">
-        <p class="oe-login-kicker oe-form-login-kicker">STUDENT PORTAL</p>
+        <p class="oe-login-kicker oe-form-login-kicker">OPEN ELECTIVE PORTAL · STUDENT</p>
         <h2>Welcome back</h2>
         <p class="oe-login-subtitle">Sign in using your Permanent Registration Number and password.</p>
         <% if (error) { %><div class="oe-form-alert" role="alert"><%= error %></div><% } %>
