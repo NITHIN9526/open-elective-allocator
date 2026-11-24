@@ -590,3 +590,28 @@ button, a { -webkit-tap-highlight-color: transparent; }
     transition-duration: .01ms !important;
   }
 }
+
+
+/* --- Separate role login selection --- */
+.login-choice { width: min(940px, calc(100% - 40px)); margin: 64px auto 72px; }
+.login-choice-heading { text-align: center; margin-bottom: 34px; }
+.login-choice-heading h1 { color: var(--gray-900); font-size: clamp(28px, 4vw, 40px); line-height: 1.15; margin: 10px 0; font-weight: 800; letter-spacing: -.8px; }
+.login-choice-heading p { color: var(--gray-500); font-size: 15px; }
+.login-choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.login-choice-card { min-width: 0; min-height: 260px; padding: 30px; border: 1px solid var(--gray-200); border-radius: 18px; background: #fff; box-shadow: var(--shadow-md); display: flex; flex-direction: column; align-items: flex-start; gap: 13px; color: var(--gray-800); text-decoration: none; transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition); }
+.login-choice-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); color: var(--gray-800); border-color: var(--primary-300); }
+.login-choice-icon { width: 54px; height: 54px; display: grid; place-items: center; border-radius: 14px; background: var(--primary-50); font-size: 27px; }
+.admin-choice .login-choice-icon { background: #ECFDF5; }
+.login-choice-title { color: var(--gray-900); font-size: 21px; font-weight: 800; }
+.login-choice-description { color: var(--gray-500); font-size: 13px; line-height: 1.7; }
+.login-choice-action { color: var(--primary-600); font-size: 13px; font-weight: 700; margin-top: auto; }
+.login-choice-register { text-align: center; color: var(--gray-500); font-size: 13px; margin-top: 28px; }
+.login-choice-register a { font-weight: 700; }
+.role-auth-layout { min-height: calc(100vh - 145px); }
+.admin-auth-layout .auth-hero { background: linear-gradient(135deg, #123b32, #0f766e); }
+@media (max-width: 700px) {
+  .login-choice { width: min(100% - 28px, 480px); margin: 36px auto 48px; }
+  .login-choice-grid { grid-template-columns: 1fr; gap: 14px; }
+  .login-choice-card { min-height: 0; padding: 22px; }
+  .login-choice-heading { margin-bottom: 24px; }
+}
