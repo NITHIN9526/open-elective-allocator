@@ -79,8 +79,17 @@
   </header>
 
 <% } else { %>
-  <!-- Public Top Bar (login/register) -->
-  <% /* No header for auth pages — handled by auth-layout */ %>
+  <!-- Public Top Bar -->
+  <header class="brand-bar public-brand-bar">
+    <a class="brand-link" href="/login" aria-label="Open Elective home">
+      <span class="brand-mark">OE</span>
+      <span class="brand-text">Open Elective<small>Government Polytechnic College, Palakkad</small></span>
+    </a>
+    <nav class="brand-nav" aria-label="Main navigation">
+      <a href="/login" <%= currentPath === '/login' ? 'aria-current="page"' : '' %>>Sign in</a>
+      <a href="/register" <%= currentPath === '/register' ? 'aria-current="page"' : '' %>>Student registration</a>
+    </nav>
+  </header>
 <% } %>
 
 <main class="container">
