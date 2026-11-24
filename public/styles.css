@@ -688,3 +688,32 @@ body:has(.oe-landing) .container { max-width:none;padding:0;margin:0; }
 /* Keep the single Admin Login card centered below registration */
 .oe-admin-grid.oe-single-admin { grid-template-columns:minmax(0,360px); justify-content:center; }
 .oe-admin-grid.oe-single-admin .oe-admin-card { width:100%; }
+
+
+/* User palette: White #ffffff, Bunker #12181e, Forest Green #27ac1f, Screamin' Green #85fe78 */
+body:has(.oe-landing) { background:#12181e;color:#ffffff; }
+.oe-landing { color:#fff;background:radial-gradient(ellipse at 50% 38%,rgba(39,172,31,.20),transparent 55%),linear-gradient(135deg,#12181e 0%,#18251d 52%,#12181e 100%); }
+.oe-landing::before { opacity:.10;background-image:linear-gradient(rgba(133,254,120,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(133,254,120,.12) 1px,transparent 1px); }
+.oe-logo,.oe-role-icon { background:linear-gradient(135deg,#27ac1f 0%,#85fe78 100%);box-shadow:0 12px 32px rgba(39,172,31,.24); }
+.oe-logo i { background:#85fe78;color:#12181e; }
+.oe-intro h1 { color:#fff; }
+.oe-intro h2 { color:#85fe78; }
+.oe-tagline { color:#c9f7c4; }
+.oe-description { color:#aab6ae; }
+.oe-student-panel { background:linear-gradient(#18231d,#18231d) padding-box,linear-gradient(115deg,#27ac1f,#85fe78,#27ac1f) border-box;box-shadow:0 20px 70px rgba(0,0,0,.25); }
+.oe-panel-heading p { color:#b4c2b5; }
+.oe-most-used { background:#85fe78;color:#12181e; }
+.oe-student-button { color:#12181e;background:linear-gradient(100deg,#27ac1f,#85fe78);box-shadow:0 9px 25px rgba(39,172,31,.22); }
+.oe-student-button:hover { color:#12181e;filter:brightness(1.05); }
+.oe-stats { border-top-color:rgba(133,254,120,.16); }
+.oe-stats strong { color:#fff; }.oe-stats small { color:#a9b9aa; }
+.oe-register p { color:#b2beb4; }
+.oe-register a { border-color:#27ac1f;color:#85fe78;background:rgba(18,24,30,.7); }
+.oe-register a:hover { color:#12181e;background:#85fe78; }
+.oe-admin-card { border-color:rgba(133,254,120,.15);background:rgba(24,35,29,.88);color:#fff; }
+.oe-admin-card:hover { color:#fff;border-color:#27ac1f;background:rgba(31,52,33,.96); }
+.oe-admin-icon,.super-card .oe-admin-icon { background:linear-gradient(135deg,#27ac1f,#85fe78);color:#12181e; }
+.oe-admin-card h2 { color:#fff; }.oe-admin-card p { color:#b0bdb2; }
+.oe-admin-card strong,.super-card strong { color:#85fe78; }
+.oe-footer { color:#829486; }
+@media(max-width:650px) { .oe-student-panel { padding-bottom:26px; } }
