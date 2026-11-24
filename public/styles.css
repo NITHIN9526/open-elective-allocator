@@ -480,3 +480,113 @@ td small { display: block; color: var(--gray-400); font-size: 11px; margin-top: 
   .approval-item { flex-direction: column; align-items: flex-start; }
   .heading-row { flex-direction: column; align-items: flex-start; }
 }
+
+
+/* ======================================================
+   Responsive layout fixes — landing, student and admin
+   ====================================================== */
+
+/* Keep page sections and footers inside a predictable viewport layout. */
+html { min-height: 100%; }
+body:not(.has-sidebar) {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+body:not(.has-sidebar) > .container { flex: 1 0 auto; width: 100%; }
+body:not(.has-sidebar) > .footer { flex-shrink: 0; }
+.auth-layout {
+  flex: 1 0 auto;
+  min-height: calc(100vh - 60px);
+  min-height: calc(100svh - 60px);
+}
+.auth-panel-wrap, .auth-card, .dashboard-grid > *,
+.dashboard-main, .dashboard-aside, .card { min-width: 0; }
+
+/* Prevent long labels and data from pushing dashboard columns off-screen. */
+.page-header-row, .card-header, .dept-row-top,
+.approval-item, .control-row { min-width: 0; }
+.dept-row-top { flex-wrap: wrap; gap: 8px; }
+.dept-badges { flex-wrap: wrap; justify-content: flex-end; }
+.table-wrap { max-width: 100%; }
+table { min-width: 560px; }
+.auth-card .form-control { min-width: 0; }
+button, a { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid var(--primary-400); outline-offset: 2px; }
+
+@media (max-width: 1024px) {
+  .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-aside { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .dashboard-aside > .card:last-child { grid-column: 1 / -1; }
+  .topbar { padding-inline: 20px; }
+}
+
+@media (max-width: 768px) {
+  .auth-layout {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+  }
+  .auth-hero { display: none; }
+  .auth-panel-wrap {
+    min-height: calc(100vh - 60px);
+    min-height: calc(100svh - 60px);
+    padding: 28px 20px;
+  }
+  .auth-card { max-width: 460px; }
+  .auth-card form { margin-top: 22px; }
+  .demo-box { overflow-wrap: anywhere; }
+
+  .brand-bar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    min-height: 72px;
+    height: auto;
+  }
+  .brand-nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .container { padding: 20px 16px 36px; }
+  .page-header { margin: -20px -16px 20px; padding: 26px 20px 22px; }
+  .dashboard-aside { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-aside > .card:last-child { grid-column: auto; }
+  .card-header { gap: 10px; flex-wrap: wrap; }
+  .card-body { padding: 18px; }
+  .course-grid, .course-admin-grid { grid-template-columns: minmax(0, 1fr); }
+  .stats-row, .stats-row.three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 480px) {
+  .auth-panel-wrap { padding: 24px 16px; }
+  .auth-card h2 { font-size: 23px; }
+  .auth-card .muted { line-height: 1.5; }
+  .stats-row, .stats-row.three { grid-template-columns: minmax(0, 1fr); }
+  .page-header-row { flex-direction: column; align-items: flex-start; }
+  .topbar { padding-inline: 12px; }
+  .topbar-user { display: none; }
+  .topbar-title { font-size: 14px; }
+  .brand-bar { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .brand-nav { justify-content: flex-start; gap: 16px; }
+  .approval-actions { width: 100%; }
+  .approval-actions form { flex: 1; }
+  .approval-actions .btn { width: 100%; }
+  .dept-row-top { align-items: flex-start; }
+  .dept-badges { justify-content: flex-start; }
+  .stat-card { padding: 16px; }
+  .stat-value { font-size: 24px; }
+}
+
+/* Respect reduced-motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
