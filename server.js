@@ -41,7 +41,10 @@ function currentStudent(db, req) { return db.students.find(s => s.prn === req.se
 
 app.get("/", (req, res) => res.redirect(req.session.user ? (req.session.user.role === "STUDENT" ? "/student" : "/admin") : "/login"));
 
-app.get("/login", (req, res) => res.render("login", { title: "Choose login" }));
+app.get("/login", (req, res) => {
+  if (req.session.user) return res.redirect(req.session.user.role === "STUDENT" ? "/student" : "/admin");
+  res.render("landing", { title: "Open Elective Portal" });
+});
 
 function authenticateAccount(req, res, next, accountType) {
   const isStudentLogin = accountType === "student";
