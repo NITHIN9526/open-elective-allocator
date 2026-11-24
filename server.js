@@ -210,8 +210,8 @@ app.post("/student/profile", requireStudent, loginLimiter, async (req, res) => {
   } else if (cgpaInput === "" || !Number.isFinite(cgpa) || cgpa < 0 || cgpa > 10 ||
       !/^\\d{1,2}(\\.\\d{1,2})?$/.test(cgpaInput)) {
     error = "Enter a valid CGPA between 0 and 10, with up to two decimal places.";
-  } else if (!/^[1-8]$/.test(semesterInput)) {
-    error = "Enter a valid semester between 1 and 8.";
+  } else if (!/^[1-6]$/.test(semesterInput)) {
+    error = "Enter a valid semester between 1 and 6.";
   } else if (!/^\\d{4}-\\d{2}$/.test(academicYear) ||
       Number(academicYear.slice(5)) !== (Number(academicYear.slice(0, 4)) + 1) % 100) {
     error = "Enter the academic year in YYYY-YY format, for example 2026-27.";
