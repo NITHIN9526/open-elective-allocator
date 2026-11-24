@@ -1,39 +1,18 @@
 <%- include("partials/header", { title }) %>
 </main>
-<div class="oe-auth-page oe-form-page">
+<div class="oe-auth-page oe-form-page oe-auth-single">
   <main class="oe-auth-shell">
-    <section class="oe-brand-side">
-      <div class="oe-brand-mark"><span>OE</span></div>
-      <div class="oe-brand-copy oe-form-brand-copy">
-        <p class="oe-eyebrow">OPEN ELECTIVE PORTAL</p>
-        <h1>Manage the process.<br><span>Make it seamless.</span></h1>
-        <div class="oe-brand-rule"></div>
-        <p class="oe-brand-description">A secure workspace for administrators to oversee student registrations, elective courses and the allocation process.</p>
-        <div class="oe-form-side-list">
-          <div class="oe-form-side-item"><span>01</span> Review and approve student accounts</div>
-          <div class="oe-form-side-item"><span>02</span> Manage departments, courses and seats</div>
-          <div class="oe-form-side-item"><span>03</span> Monitor preferences and allotments</div>
-        </div>
-      </div>
-      <div class="oe-brand-bottom"><span class="oe-status-dot"></span> Administrator access · Protected sign in</div>
-      <i class="oe-decor oe-decor-one"></i><i class="oe-decor oe-decor-two"></i>
-    </section>
     <section class="oe-login-side">
       <div class="oe-login-content">
+        <div class="oe-single-brand"><span>OE</span><strong>OPEN ELECTIVE PORTAL</strong></div>
         <p class="oe-login-kicker oe-form-login-kicker">ADMINISTRATION</p>
         <h2>Welcome back</h2>
         <p class="oe-login-subtitle">Sign in with your administrator credentials to continue.</p>
         <% if (error) { %><div class="oe-form-alert" role="alert"><%= error %></div><% } %>
         <form method="post" action="/admin/login" class="oe-form-stack">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-          <div class="oe-form-group">
-            <label for="admin-username">Admin username</label>
-            <input id="admin-username" class="oe-form-control" name="username" autocomplete="username" required placeholder="Enter admin username">
-          </div>
-          <div class="oe-form-group">
-            <label for="admin-password">Password</label>
-            <input id="admin-password" class="oe-form-control" type="password" name="password" autocomplete="current-password" required placeholder="Enter your password">
-          </div>
+          <div class="oe-form-group"><label for="admin-username">Admin username</label><input id="admin-username" class="oe-form-control" name="username" autocomplete="username" required placeholder="Enter admin username"></div>
+          <div class="oe-form-group"><label for="admin-password">Password</label><input id="admin-password" class="oe-form-control" type="password" name="password" autocomplete="current-password" required placeholder="Enter your password"></div>
           <button class="oe-form-submit" type="submit">Sign in securely <span aria-hidden="true">→</span></button>
         </form>
         <div class="oe-form-note">This area is restricted to authorized administrators.</div>
