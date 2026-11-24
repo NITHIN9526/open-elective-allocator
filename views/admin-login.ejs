@@ -1,0 +1,21 @@
+<%- include("partials/header", { title }) %>
+</main>
+<div class="auth-layout role-auth-layout admin-auth-layout">
+  <div class="auth-hero"><div class="auth-hero-content">
+    <span class="eyebrow">ADMINISTRATION</span><h1>Admin<br><em>Portal</em></h1>
+    <p>Secure access for authorized administrators to manage the Open Elective allocation process.</p>
+    <div class="auth-features"><div class="auth-feature">👥 Student account approvals</div><div class="auth-feature">📚 Course and seat management</div><div class="auth-feature">📊 Preferences and allotments</div></div>
+  </div></div>
+  <div class="auth-panel-wrap"><div class="auth-card">
+    <h2>Admin Login</h2><p class="muted text-sm">For authorized administrators only.</p>
+    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+    <form method="post" action="/admin/login" class="form-stack">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-group"><label class="form-label" for="admin-username">Admin username</label><input id="admin-username" class="form-control" name="username" autocomplete="username" required placeholder="Enter admin username"></div>
+      <div class="form-group"><label class="form-label" for="admin-password">Password</label><input id="admin-password" class="form-control" type="password" name="password" autocomplete="current-password" required placeholder="Enter your password"></div>
+      <button class="btn btn-primary btn-full btn-lg" type="submit">Sign in as Admin</button>
+    </form>
+    <div class="auth-bottom"><a href="/login">← Back to login selection</a></div>
+  </div></div>
+</div>
+<footer class="footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad</footer><script src="/app.js"></script></body></html>
