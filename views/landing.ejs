@@ -1,50 +1,50 @@
 <%- include("partials/header", { title }) %>
 </main>
-<section class="landing-hero">
-  <div class="landing-hero-inner">
-    <div class="landing-hero-copy">
-      <span class="eyebrow">GOVERNMENT POLYTECHNIC COLLEGE, PALAKKAD</span>
-      <h1>Choose Your Future.<br><em>Choose Your Electives.</em></h1>
-      <p class="landing-lead">Welcome to the Open Elective Course Allocation Portal. Explore available courses, submit your preferences and follow the allotment process in one place.</p>
-      <div class="landing-hero-actions">
-        <a class="btn btn-primary btn-lg" href="#portal-access">Access Your Portal ↓</a>
-        <a class="landing-secondary-link" href="/register">New student? Register here</a>
-      </div>
+<section class="oe-landing">
+  <div class="oe-intro">
+    <div class="oe-logo" aria-hidden="true"><span>OE</span><i>✦</i></div>
+    <h1>Open Elective Portal</h1>
+    <h2>Government Polytechnic College, Palakkad</h2>
+    <p class="oe-tagline">A Simple and Transparent Course Allocation System</p>
+    <p class="oe-description">Explore elective courses, submit your preferences and track your allotment in one place.</p>
+  </div>
+  <section class="oe-student-panel" aria-labelledby="student-login-heading">
+    <div class="oe-panel-heading">
+      <div class="oe-role-icon student-icon">♧</div>
+      <div><h2 id="student-login-heading">Student Login <span class="oe-most-used">MOST USED</span></h2>
+      <p>Access your elective courses and allocation dashboard</p></div>
     </div>
-    <div class="landing-hero-art" aria-hidden="true">
-      <div class="landing-art-orbit orbit-one"></div><div class="landing-art-orbit orbit-two"></div>
-      <div class="landing-art-card"><span class="landing-art-mark">OE</span><strong>OPEN ELECTIVE</strong><small>COURSE ALLOCATION</small><div class="landing-art-lines"><i></i><i></i><i></i></div><span class="landing-art-check">✓</span></div>
-      <span class="landing-art-dot dot-one"></span><span class="landing-art-dot dot-two"></span><span class="landing-art-dot dot-three"></span>
+    <a class="oe-student-button" href="/student/login">Sign In as Student <span>→</span></a>
+    <div class="oe-student-features">
+      <div><span>⌕</span><small>Browse Courses</small></div>
+      <div><span>▤</span><small>Rank Preferences</small></div>
+      <div><span>♙</span><small>Track Allotment</small></div>
     </div>
+    <div class="oe-stats">
+      <div><strong><%= stats.departments %>+</strong><small>Departments</small></div>
+      <div><strong><%= stats.courses %>+</strong><small>Elective Courses</small></div>
+      <div><strong><%= stats.students %>+</strong><small>Students</small></div>
+    </div>
+  </section>
+  <div class="oe-register">
+    <p>New student? Create your account</p>
+    <a href="/register"><span>♙</span> Register Now <b>›</b></a>
   </div>
-  <a class="landing-scroll-cue" href="#about-portal"><span></span> Scroll to explore</a>
+  <section class="oe-admin-grid" aria-label="Administrative portals">
+    <a class="oe-admin-card officer-card" href="/admin/login">
+      <span class="oe-admin-icon">▥</span>
+      <h2>Placement Officer</h2>
+      <p>Manage students, courses, preferences and the elective allocation process</p>
+      <strong>Continue <span>→</span></strong>
+    </a>
+    <a class="oe-admin-card super-card" href="/admin/login">
+      <span class="oe-admin-icon">♢</span>
+      <h2>Super Admin</h2>
+      <p>Oversee the portal, manage administration and monitor allocation activity</p>
+      <strong>Continue <span>→</span></strong>
+    </a>
+  </section>
+  <footer class="oe-footer">© <%= new Date().getFullYear() %> Open Elective Portal · Government Polytechnic College, Palakkad</footer>
 </section>
-<section class="landing-about" id="about-portal">
-  <div class="landing-section-heading"><span class="eyebrow">ABOUT THE PORTAL</span><h2>Everything you need for<br>your elective selection</h2><p>A simple and transparent process for students and administrators.</p></div>
-  <div class="landing-feature-grid">
-    <article class="landing-feature"><span>📚</span><h3>Explore Courses</h3><p>View the elective courses offered by different departments and their available seats.</p></article>
-    <article class="landing-feature"><span>📋</span><h3>Rank Preferences</h3><p>Submit your elective choices in priority order through your student account.</p></article>
-    <article class="landing-feature"><span>⚖️</span><h3>Fair Allocation</h3><p>Course allotment is processed using the configured merit and seat-allocation rules.</p></article>
-    <article class="landing-feature"><span>📊</span><h3>Track Results</h3><p>Check your allotment status and view your result after it is published.</p></article>
-  </div>
-</section>
-<section class="landing-access" id="portal-access">
-  <div class="landing-section-heading"><span class="eyebrow">PORTAL ACCESS</span><h2>Choose your login</h2><p>Select the portal according to your role.</p></div>
-  <div class="landing-access-grid">
-    <article class="landing-access-card student-access">
-      <div class="landing-access-icon">🎓</div><span class="landing-access-kicker">FOR STUDENTS</span><h3>Student Login</h3>
-      <p>Sign in with your PRN and password to manage your elective preferences and check allotment results.</p>
-      <a class="btn btn-primary btn-full" href="/student/login">Student Login <span>→</span></a>
-      <div class="landing-access-foot">New student? <a href="/register">Create an account</a></div>
-    </article>
-    <article class="landing-access-card admin-access">
-      <div class="landing-access-icon">🛡️</div><span class="landing-access-kicker">AUTHORIZED PERSONNEL</span><h3>Admin Login</h3>
-      <p>Access administration tools to manage student accounts, courses, seat capacities, preferences and allotments.</p>
-      <a class="btn btn-full landing-admin-button" href="/admin/login">Admin Login <span>→</span></a>
-      <div class="landing-access-foot">Restricted to authorized administrators</div>
-    </article>
-  </div>
-</section>
-<footer class="landing-footer"><div><strong>Open Elective Portal</strong><span>Government Polytechnic College, Palakkad</span></div><span>© <%= new Date().getFullYear() %> Open Elective Portal</span></footer>
 <script src="/app.js"></script>
 </body></html>
