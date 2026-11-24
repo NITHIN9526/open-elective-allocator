@@ -193,7 +193,7 @@ app.post("/student/profile", requireStudent, loginLimiter, async (req, res) => {
     });
   }
 
-  const mobile = String(req.body.mobile || "").replace(/[\\s-]/g, "");
+  const mobile = String(req.body.mobile || "").replace(/[\s-]/g, "");
   const email = String(req.body.email || "").trim().toLowerCase();
   const cgpaInput = String(req.body.cgpa || "").trim();
   const semesterInput = String(req.body.semester || "").trim();
@@ -203,16 +203,16 @@ app.post("/student/profile", requireStudent, loginLimiter, async (req, res) => {
   const formData = { mobile, email, cgpa: cgpaInput, semester: semesterInput, academicYear };
 
   let error = null;
-  if (!/^(?:\\+91)?[6-9]\\d{9}$/.test(mobile)) {
+  if (!/^(?:\+91)?[6-9]\d{9}$/.test(mobile)) {
     error = "Enter a valid 10-digit Indian mobile number, optionally with +91.";
-  } else if (email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+  } else if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     error = "Enter a valid email address.";
   } else if (cgpaInput === "" || !Number.isFinite(cgpa) || cgpa < 0 || cgpa > 10 ||
-      !/^\\d{1,2}(\\.\\d{1,2})?$/.test(cgpaInput)) {
+      !/^\d{1,2}(\.\d{1,2})?$/.test(cgpaInput)) {
     error = "Enter a valid CGPA between 0 and 10, with up to two decimal places.";
   } else if (!/^[1-6]$/.test(semesterInput)) {
     error = "Enter a valid semester between 1 and 6.";
-  } else if (!/^\\d{4}-\\d{2}$/.test(academicYear) ||
+  } else if (!/^\d{4}-\d{2}$/.test(academicYear) ||
       Number(academicYear.slice(5)) !== (Number(academicYear.slice(0, 4)) + 1) % 100) {
     error = "Enter the academic year in YYYY-YY format, for example 2026-27.";
   }
