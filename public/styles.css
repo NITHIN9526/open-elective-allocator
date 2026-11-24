@@ -804,3 +804,42 @@ body:has(.oe-auth-page) .container { max-width:none;margin:0;padding:0; }
  .oe-form-page .oe-login-side { padding:28px 21px 24px; }
  .oe-form-links { flex-direction:column; }
 }
+
+
+/* Student login: compact brand panel and complete form contained in the frame */
+.oe-student-login-compact { min-height:100vh;padding:20px 4vw; }
+.oe-student-login-compact .oe-auth-shell {
+  width:min(1310px,100%);min-height:min(820px,calc(100vh - 40px));
+  grid-template-columns:minmax(170px,.34fr) minmax(0,1fr);
+}
+.oe-student-login-compact .oe-brand-side {
+  min-height:0;padding:42px 34px;justify-content:flex-start;align-items:center;
+}
+.oe-student-login-compact .oe-brand-mark { width:68px;height:68px;border-radius:20px; }
+.oe-student-login-compact .oe-login-side {
+  min-width:0;min-height:0;padding:clamp(38px,7vh,76px) clamp(32px,8vw,120px);
+  justify-content:center;align-items:center;
+}
+.oe-student-login-compact .oe-login-content { max-width:520px; }
+.oe-student-login-compact .oe-login-content h2 { font-size:clamp(30px,3vw,40px); }
+.oe-student-login-compact .oe-login-subtitle { margin-bottom:38px; }
+.oe-student-login-compact .oe-form-stack { gap:22px; }
+.oe-student-login-compact .oe-form-control { min-height:56px;font-size:14px; }
+.oe-student-login-compact .oe-form-submit { min-height:58px;margin-top:5px; }
+.oe-student-login-compact .oe-form-links { margin-top:30px; }
+.oe-student-login-compact .oe-login-footer { max-width:520px;margin:45px auto 0;text-align:center; }
+@media(max-width:800px) {
+ .oe-student-login-compact { padding:14px; }
+ .oe-student-login-compact .oe-auth-shell { min-height:calc(100vh - 28px);grid-template-columns:1fr; }
+ .oe-student-login-compact .oe-brand-side { min-height:105px;padding:18px 22px;align-items:flex-start; }
+ .oe-student-login-compact .oe-brand-mark { width:52px;height:52px;border-radius:15px; }
+ .oe-student-login-compact .oe-login-side { padding:38px 28px; }
+ .oe-student-login-compact .oe-login-footer { margin-top:35px; }
+}
+@media(max-width:480px) {
+ .oe-student-login-compact { padding:0; }
+ .oe-student-login-compact .oe-auth-shell { min-height:100vh;border:0;border-radius:0; }
+ .oe-student-login-compact .oe-brand-side { min-height:88px;padding:17px 21px; }
+ .oe-student-login-compact .oe-login-side { padding:34px 22px 25px; }
+ .oe-student-login-compact .oe-form-links { flex-direction:column; }
+}
