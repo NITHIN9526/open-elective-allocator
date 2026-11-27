@@ -26,7 +26,6 @@ app.use(session({
   saveUninitialized: false,
   cookie: { httpOnly: true, sameSite: "lax", secure: false, maxAge: config.sessionMaxAgeMs }
 }));
-app.use("/admin/student-data", require("./src/studentImportExport"));
 app.use(csrf);
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
@@ -36,6 +35,9 @@ app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   next();
 });
+// Mount this router after shared view locals are initialized. Its EJS views
+// rely on user, flash, currentPath and csrfToken from the application middleware.
+app.use("/admin/student-data", require("./src/studentImportExport"));
 
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false });
 function flash(req, type, message) { req.session.flash = { type, message }; }
