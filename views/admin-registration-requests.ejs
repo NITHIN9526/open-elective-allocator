@@ -9,6 +9,24 @@
   <div class="badge badge-warning"><%= pendingRegistrations.length %> pending</div>
 </div>
 
+<% if (pendingRegistrations.length) { %>
+  <div class="card">
+    <div class="card-body">
+      <div class="approval-actions">
+        <form id="bulk-approve-selected" method="post" action="/admin/students/approve-selected">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="btn btn-primary" type="submit" onclick="return confirm('Approve all selected student registrations?');">Approve selected</button>
+        </form>
+        <form method="post" action="/admin/students/approve-all" onsubmit="return confirm('Approve ALL <%= pendingRegistrations.length %> pending student registrations?');">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="btn btn-success" type="submit">Approve all (<%= pendingRegistrations.length %>)</button>
+        </form>
+        <span class="text-muted text-xs">Select individual students below, or approve every pending registration.</span>
+      </div>
+    </div>
+  </div>
+<% } %>
+
 <div class="card">
   <div class="card-header">
     <h2>Pending registrations</h2>
@@ -21,11 +39,15 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>PRN</th><th>Student name</th><th>Department</th><th>Registration date</th><th>Action</th></tr>
+            <tr>
+              <th><input type="checkbox" id="select-all-pending" aria-label="Select all pending students"></th>
+              <th>PRN</th><th>Student name</th><th>Department</th><th>Registration date</th><th>Action</th>
+            </tr>
           </thead>
           <tbody>
             <% pendingRegistrations.forEach(student => { %>
               <tr>
+                <td><input type="checkbox" class="pending-student-checkbox" name="prns" value="<%= student.prn %>" form="bulk-approve-selected" aria-label="Select <%= student.prn %>"></td>
                 <td><code><%= student.prn %></code></td>
                 <td><strong><%= student.name %></strong></td>
                 <td><%= student.department %></td>
@@ -73,5 +95,27 @@
     </div>
   </div>
 <% } %>
+
+<script>
+  (() => {
+    const selectAll = document.getElementById("select-all-pending");
+    const boxes = Array.from(document.querySelectorAll(".pending-student-checkbox"));
+    if (!selectAll) return;
+    selectAll.addEventListener("change", () => {
+      boxes.forEach(box => { box.checked = selectAll.checked; });
+    });
+    boxes.forEach(box => box.addEventListener("change", () => {
+      selectAll.checked = boxes.length > 0 && boxes.every(item => item.checked);
+      selectAll.indeterminate = boxes.some(item => item.checked) && !selectAll.checked;
+    }));
+    const bulkForm = document.getElementById("bulk-approve-selected");
+    if (bulkForm) bulkForm.addEventListener("submit", event => {
+      if (!boxes.some(box => box.checked)) {
+        event.preventDefault();
+        alert("Select at least one student to approve.");
+      }
+    });
+  })();
+</script>
 
 <%- include("partials/footer") %>
