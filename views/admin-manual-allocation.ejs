@@ -57,7 +57,7 @@
                 <td>
                   <form method="post" action="/admin/manual-allocation/<%= encodeURIComponent(student.prn) %>" style="display:flex;gap:8px;align-items:center;min-width:260px;">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <select name="courseId" required style="min-width:170px;">
+                    <select name="courseId" style="min-width:170px;">
                       <option value="">Not allocated</option>
                       <% courses.forEach(course => { %>
                         <option value="<%= course.id %>" <%= student.allotment && student.allotment.courseId === course.id ? "selected" : "" %>>
