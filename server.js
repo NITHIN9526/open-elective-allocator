@@ -534,12 +534,25 @@ app.post("/admin/allocation/run", requireAdmin, (req, res) => {
     if (!preferenceMap.has(p.prn)) preferenceMap.set(p.prn, []);
     preferenceMap.get(p.prn).push(p);
   });
-  const eligible = db.students.filter(s => s.accountStatus === "ACTIVE" && preferenceMap.has(s.prn))
-    .sort((a,b) => b.cgpa - a.cgpa || a.prn.localeCompare(b.prn));
+  // Allocation priority: CGPA > 8.00 students are processed first.
+  // Within each group, higher CGPA wins; identical CGPA is resolved by PRN ascending.
+  const eligible = db.students
+    .filter(s => s.accountStatus === "ACTIVE" && preferenceMap.has(s.prn))
+    .sort((a, b) => {
+      const aCgpa = Number(a.cgpa) || 0;
+      const bCgpa = Number(b.cgpa) || 0;
+      const aPriorityGroup = aCgpa > 8 ? 0 : 1;
+      const bPriorityGroup = bCgpa > 8 ? 0 : 1;
+      return aPriorityGroup - bPriorityGroup ||
+        bCgpa - aCgpa ||
+        String(a.prn).localeCompare(String(b.prn));
+    });
   const counts = Object.fromEntries(db.courses.map(c => [c.id, 0]));
   const ties = [];
   for (let i = 1; i < eligible.length; i++) {
-    if (eligible[i].cgpa === eligible[i-1].cgpa) ties.push({ cgpa: eligible[i].cgpa, prns: [eligible[i-1].prn, eligible[i].prn] });
+    if (Number(eligible[i].cgpa) === Number(eligible[i-1].cgpa)) {
+      ties.push({ cgpa: Number(eligible[i].cgpa), prns: [eligible[i-1].prn, eligible[i].prn] });
+    }
   }
   eligible.forEach(student => {
     const prefs = preferenceMap.get(student.prn).sort((a,b) => a.rank-b.rank);
