@@ -27,6 +27,9 @@
       <a href="/admin" class="<%= currentPath === '/admin' ? 'active' : '' %>">
         <span class="nav-icon">📊</span> Dashboard
       </a>
+      <a href="/admin/registration-requests" class="<%= currentPath.startsWith('/admin/registration-requests') ? 'active' : '' %>">
+        <span class="nav-icon">✅</span> Registration Approvals
+      </a>
       <a href="/admin/students" class="<%= currentPath.startsWith('/admin/students') ? 'active' : '' %>">
         <span class="nav-icon">👥</span> Students
       </a>
