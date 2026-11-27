@@ -484,10 +484,19 @@ app.post("/admin/students/:prn/edit", requireAdmin, loginLimiter, async (req, re
 app.get("/admin/courses", requireAdmin, (req, res) => {
   const db = readDb();
   const rows = db.courses.map(course => {
-    const used = db.allotments.filter(a => a.courseId === course.id && ["PROPOSED","APPROVED"].includes(a.status)).length;
-    return { ...course, used, remaining: course.capacity - used };
+    const courseAllotments = db.allotments.filter(a => a.courseId === course.id);
+    const used = courseAllotments.filter(a => ["PROPOSED","APPROVED"].includes(a.status)).length;
+    const preferenceCount = db.preferences.filter(p => p.courseId === course.id).length;
+    return {
+      ...course, used, remaining: course.capacity - used,
+      preferenceCount, allotmentCount: courseAllotments.length
+    };
   });
-  res.render("admin-courses", { title: "Course management", courses: rows });
+  res.render("admin-courses", {
+    title: "Course management",
+    courses: rows,
+    departments: db.departments
+  });
 });
 
 app.post("/admin/courses", requireAdmin, (req, res) => {
