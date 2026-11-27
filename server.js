@@ -565,6 +565,93 @@ app.post("/admin/allocation/run", requireAdmin, (req, res) => {
   res.redirect("/admin/allotments");
 });
 
+app.get("/admin/manual-allocation", requireAdmin, (req, res) => {
+  const db = readDb();
+  const activeStudents = db.students
+    .filter(student => student.accountStatus === "ACTIVE")
+    .map(student => ({
+      ...student,
+      allotment: db.allotments.find(row => row.prn === student.prn) || null
+    }))
+    .sort((a, b) => a.prn.localeCompare(b.prn));
+  const courseUsage = db.courses.map(course => ({
+    ...course,
+    used: db.allotments.filter(row =>
+      row.courseId === course.id && ["PROPOSED", "APPROVED"].includes(row.status)
+    ).length
+  }));
+  res.render("admin-manual-allocation", {
+    title: "Manual Course Allocation",
+    students: activeStudents,
+    courses: courseUsage
+  });
+});
+
+app.post("/admin/manual-allocation/:prn", requireAdmin, (req, res) => {
+  const db = readDb();
+  const student = db.students.find(item => item.prn === req.params.prn && item.accountStatus === "ACTIVE");
+  if (!student) {
+    flash(req, "error", "Active student not found.");
+    return res.redirect("/admin/manual-allocation");
+  }
+
+  const courseId = String(req.body.courseId || "").trim();
+  let allotment = db.allotments.find(row => row.prn === student.prn);
+  const previousCourseId = allotment ? allotment.courseId : null;
+
+  if (courseId && !db.courses.some(course => course.id === courseId)) {
+    flash(req, "error", "Select a valid course.");
+    return res.redirect("/admin/manual-allocation");
+  }
+
+  if (courseId) {
+    const course = db.courses.find(item => item.id === courseId);
+    const occupied = db.allotments.filter(row =>
+      row.prn !== student.prn &&
+      row.courseId === courseId &&
+      ["PROPOSED", "APPROVED"].includes(row.status)
+    ).length;
+    if (occupied >= course.capacity) {
+      flash(req, "error", course.name + " has reached its capacity (" + course.capacity + ").");
+      return res.redirect("/admin/manual-allocation");
+    }
+  }
+
+  const now = new Date().toISOString();
+  if (!allotment) {
+    allotment = {
+      prn: student.prn,
+      courseId: null,
+      cgpa: Number(student.cgpa) || 0,
+      preferenceRank: null,
+      status: "UNALLOCATED",
+      tieFlag: false,
+      reviewedBy: null,
+      reviewedAt: null
+    };
+    db.allotments.push(allotment);
+  }
+
+  allotment.courseId = courseId || null;
+  allotment.cgpa = Number(student.cgpa) || 0;
+  allotment.preferenceRank = null;
+  allotment.status = courseId ? "APPROVED" : "UNALLOCATED";
+  allotment.reviewedBy = req.session.user.username;
+  allotment.reviewedAt = now;
+
+  const oldName = db.courses.find(course => course.id === previousCourseId)?.name || "Not allocated";
+  const newName = db.courses.find(course => course.id === courseId)?.name || "Not allocated";
+  audit(db, req.session.user.username, "MANUAL_COURSE_ALLOCATION",
+    student.prn + ": " + oldName + " -> " + newName);
+  db.meta.allocationStatus = "MANUAL_ADMIN_UPDATED";
+  writeDb(db);
+
+  flash(req, "success", courseId
+    ? student.prn + " allocated to " + newName + "."
+    : student.prn + " is now marked as not allocated.");
+  res.redirect("/admin/manual-allocation");
+});
+
 app.get("/admin/allotments", requireAdmin, (req, res) => {
   const db = readDb();
   const rows = db.allotments.map(a => ({
