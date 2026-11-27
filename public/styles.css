@@ -1137,7 +1137,6 @@ button, .btn, a { touch-action:manipulation; }
   .table-wrap table { width:max-content; min-width:680px; max-width:none; }
   .table-wrap th, .table-wrap td { padding:10px 12px; white-space:normal; }
   .table-wrap td .btn { white-space:nowrap; }
-  table:not(.table-wrap table) { display:block; width:100%; overflow-x:auto; }
 }
 
 @media (max-width: 560px) {
