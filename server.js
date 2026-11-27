@@ -26,6 +26,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: { httpOnly: true, sameSite: "lax", secure: false, maxAge: config.sessionMaxAgeMs }
 }));
+app.use("/admin/student-data", require("./src/studentImportExport"));
 app.use(csrf);
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
