@@ -19,7 +19,7 @@
         <thead>
           <tr>
             <th>PRN</th><th>Name</th><th>Department</th><th>CGPA</th>
-            <th>Account Status</th><th>Profile Status</th>
+            <th>Account Status</th><th>Profile Status</th><th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -35,6 +35,7 @@
                 <%= s.profileCompleted === true ? 'COMPLETED' : 'INCOMPLETE' %>
               </span>
             </td>
+            <td><a class="btn btn-secondary btn-sm" href="/admin/students/<%= encodeURIComponent(s.prn) %>/edit">Edit</a></td>
           </tr>
           <% }) %>
         </tbody>
