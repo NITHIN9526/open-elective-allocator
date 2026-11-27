@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log*
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+credentials
+secrets
+data/*.json
+data/*.tmp
+coverage
+.DS_Store
+docker-compose*.yml

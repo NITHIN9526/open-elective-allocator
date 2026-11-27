@@ -1,0 +1,21 @@
+services:
+  open-elective:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: open-elective-portal
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      GOOGLE_SERVICE_ACCOUNT_KEY: /app/credentials/google-service-account.json
+    volumes:
+      - open_elective_data:/app/data
+      - ./credentials:/app/credentials:ro
+
+volumes:
+  open_elective_data:
