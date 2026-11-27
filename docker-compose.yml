@@ -12,10 +12,8 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      GOOGLE_SERVICE_ACCOUNT_KEY: /app/credentials/google-service-account.json
     volumes:
       - open_elective_data:/app/data
-      - ./credentials:/app/credentials:ro
 
 volumes:
   open_elective_data:
