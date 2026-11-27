@@ -490,6 +490,68 @@ app.get("/admin/courses", requireAdmin, (req, res) => {
   res.render("admin-courses", { title: "Course management", courses: rows });
 });
 
+app.post("/admin/courses", requireAdmin, (req, res) => {
+  const db = readDb();
+  const id = String(req.body.id || "").trim().toUpperCase();
+  const name = String(req.body.name || "").trim();
+  const offeredBy = String(req.body.offeredBy || "").trim().toUpperCase();
+  const description = String(req.body.description || "").trim();
+  const capacity = Number(req.body.capacity);
+  if (!/^[A-Z0-9][A-Z0-9_-]{2,39}$/.test(id) || db.courses.some(c => c.id === id)) {
+    flash(req, "error", "Enter a unique course code (3–40 letters, numbers, hyphens or underscores).");
+    return res.redirect("/admin/courses");
+  }
+  if (!name || name.length > 120 || !db.departments.some(d => d.code === offeredBy) ||
+      !Number.isInteger(capacity) || capacity < 1 || capacity > 500 || description.length > 500) {
+    flash(req, "error", "Check the course name, department, capacity (1–500) and description (maximum 500 characters).");
+    return res.redirect("/admin/courses");
+  }
+  db.courses.push({ id, name, offeredBy, capacity, description });
+  audit(db, req.session.user.username, "COURSE_CREATED", id + ": " + name + " (" + offeredBy + ")");
+  writeDb(db);
+  flash(req, "success", "Course added successfully.");
+  res.redirect("/admin/courses");
+});
+
+app.post("/admin/courses/:id/edit", requireAdmin, (req, res) => {
+  const db = readDb();
+  const course = db.courses.find(c => c.id === req.params.id);
+  if (!course) { flash(req, "error", "Course not found."); return res.redirect("/admin/courses"); }
+  const name = String(req.body.name || "").trim();
+  const offeredBy = String(req.body.offeredBy || "").trim().toUpperCase();
+  const description = String(req.body.description || "").trim();
+  const capacity = Number(req.body.capacity);
+  const used = db.allotments.filter(a => a.courseId === course.id && ["PROPOSED", "APPROVED"].includes(a.status)).length;
+  if (!name || name.length > 120 || !db.departments.some(d => d.code === offeredBy) ||
+      !Number.isInteger(capacity) || capacity < used || capacity > 500 || capacity < 1 || description.length > 500) {
+    flash(req, "error", "Check the course name, department, capacity (1–500 and not below current allotments) and description (maximum 500 characters).");
+    return res.redirect("/admin/courses");
+  }
+  const previous = course.name + " (" + course.offeredBy + ")";
+  Object.assign(course, { name, offeredBy, capacity, description });
+  audit(db, req.session.user.username, "COURSE_UPDATED", course.id + ": " + previous + " -> " + name + " (" + offeredBy + ")");
+  writeDb(db);
+  flash(req, "success", "Course details updated.");
+  res.redirect("/admin/courses");
+});
+
+app.post("/admin/courses/:id/delete", requireAdmin, (req, res) => {
+  const db = readDb();
+  const course = db.courses.find(c => c.id === req.params.id);
+  if (!course) { flash(req, "error", "Course not found."); return res.redirect("/admin/courses"); }
+  const preferenceCount = db.preferences.filter(p => p.courseId === course.id).length;
+  const allotmentCount = db.allotments.filter(a => a.courseId === course.id).length;
+  if (preferenceCount || allotmentCount) {
+    flash(req, "error", "This course cannot be removed because student preferences or allotment records refer to it. Keep it, or resolve those records first.");
+    return res.redirect("/admin/courses");
+  }
+  db.courses = db.courses.filter(c => c.id !== course.id);
+  audit(db, req.session.user.username, "COURSE_DELETED", course.id + ": " + course.name);
+  writeDb(db);
+  flash(req, "success", "Course removed successfully.");
+  res.redirect("/admin/courses");
+});
+
 app.post("/admin/courses/:id/capacity", requireAdmin, (req, res) => {
   const db = readDb();
   const course = db.courses.find(c => c.id === req.params.id);
