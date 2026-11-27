@@ -31,6 +31,81 @@ For development with automatic restart:
 npm run dev
 ```
 
+## Run with Docker
+
+Docker is the recommended way to run the portal in a container. Docker Compose builds the image, publishes the web app on port `3000`, persists the local JSON database in a named volume, and mounts the Google service-account key as read-only.
+
+### Prerequisites
+
+- Docker Desktop (Windows/macOS) or Docker Engine with the Compose plugin (Linux)
+- The Google service-account JSON key, if you want Google Sheets profile synchronization
+
+### Prepare environment and credentials
+
+1. Create a `.env` file in the project root (next to `docker-compose.yml`):
+
+   ```env
+   GOOGLE_SHEETS_ID=1f0NeuxSPcS9IqZb0Cczn2cp8y4rv2UGOPPjAK_FDiZo
+   GOOGLE_SERVICE_ACCOUNT_KEY=/app/credentials/google-service-account.json
+   SESSION_SECRET=replace-with-a-long-random-secret
+   ```
+
+2. Put your service-account JSON key at:
+
+   ```text
+   credentials/google-service-account.json
+   ```
+
+   The `credentials` folder is mounted read-only into the container. The key is not copied into the Docker image. Keep `.env` and the JSON key out of Git.
+
+3. Share the Google spreadsheet with the service-account email and grant **Editor** access. Confirm the `Students` tab has the required column headings listed in the Google Sheets section above.
+
+### Build and start
+
+Run these commands from the project root:
+
+```powershell
+docker compose up --build -d
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+View application logs:
+
+```powershell
+docker compose logs -f open-elective
+```
+
+Stop the container:
+
+```powershell
+docker compose down
+```
+
+### Persistent data and reset
+
+The app's local JSON database is stored in the Docker named volume `open_elective_data`, so it survives container rebuilds and restarts. The Google Sheet is not copied into this volume; profile synchronization continues to use the mounted service-account key and spreadsheet ID.
+
+To stop the app but keep data:
+
+```powershell
+docker compose down
+```
+
+To permanently delete the local database volume and all local portal accounts/preferences/allotments:
+
+```powershell
+docker compose down -v
+```
+
+The command above does **not** delete or reset Google Sheets data. Do not use `-v` unless you intend to erase the local portal database.
+
+To rebuild after code changes:
+
+```powershell
+docker compose up --build -d
+```
+
 ## Google Sheets integration
 
 The portal synchronizes a student's completed profile to the existing college spreadsheet. It updates the matching student row in the `Students` tab using the student's PRN. It does not append a new row, and it stops without changing the sheet if the PRN is missing or appears more than once.
