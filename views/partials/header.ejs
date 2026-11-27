@@ -27,8 +27,11 @@
       <a href="/admin" class="<%= currentPath === '/admin' ? 'active' : '' %>">
         <span class="nav-icon">📊</span> Dashboard
       </a>
-      <a href="/admin/students" class="<%= currentPath === '/admin/students' ? 'active' : '' %>">
+      <a href="/admin/students" class="<%= currentPath.startsWith('/admin/students') ? 'active' : '' %>">
         <span class="nav-icon">👥</span> Students
+      </a>
+      <a href="/admin/profile-requests" class="<%= currentPath.startsWith('/admin/profile-requests') ? 'active' : '' %>">
+        <span class="nav-icon">✉️</span> Profile Update Requests
       </a>
       <a href="/admin/courses" class="<%= currentPath === '/admin/courses' ? 'active' : '' %>">
         <span class="nav-icon">📚</span> Courses
