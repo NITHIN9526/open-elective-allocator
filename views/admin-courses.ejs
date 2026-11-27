@@ -34,7 +34,7 @@
         <label class="form-label" for="new-course-description">Description</label>
         <textarea class="form-control" id="new-course-description" name="description" rows="2" maxlength="500" placeholder="Brief course description"></textarea>
       </div>
-      <div><button class="btn btn-primary" type="submit">＋ Add Course</button></div>
+      <div><button class="btn btn-primary" type="submit"><svg class="icon" aria-hidden="true"><use href="/icons.svg#check"></use></svg> Add Course</button></div>
     </form>
   </div>
 </section>
@@ -65,7 +65,7 @@
       <span class="text-xs text-muted"><%= usagePct %>% utilized</span>
 
       <details style="margin-top:16px;">
-        <summary class="btn btn-secondary btn-sm" style="cursor:pointer;display:inline-block;">✎ Edit course details</summary>
+        <summary class="btn btn-secondary btn-sm" style="cursor:pointer;display:inline-block;"><svg class="icon" aria-hidden="true"><use href="/icons.svg#edit"></use></svg> Edit course details</summary>
         <form method="post" action="/admin/courses/<%= encodeURIComponent(c.id) %>/edit" style="margin-top:14px;">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <div class="form-group">
