@@ -460,6 +460,54 @@ app.get("/admin/registration-requests", requireAdmin, (req, res) => {
   });
 });
 
+app.post("/admin/students/approve-selected", requireAdmin, (req, res) => {
+  const db = readDb();
+  const submitted = req.body.prns;
+  const selectedPrns = [...new Set((Array.isArray(submitted) ? submitted : submitted ? [submitted] : [])
+    .map(value => String(value).trim()).filter(Boolean))];
+
+  if (!selectedPrns.length) {
+    flash(req, "error", "Select at least one pending student to approve.");
+    return res.redirect("/admin/registration-requests");
+  }
+
+  const selectedSet = new Set(selectedPrns);
+  const pendingStudents = db.students.filter(student =>
+    selectedSet.has(student.prn) && student.accountStatus === "PENDING"
+  );
+
+  if (!pendingStudents.length) {
+    flash(req, "error", "No selected students are currently pending approval.");
+    return res.redirect("/admin/registration-requests");
+  }
+
+  pendingStudents.forEach(student => {
+    student.accountStatus = "ACTIVE";
+    audit(db, req.session.user.username, "STUDENT_APPROVED", student.prn);
+  });
+  writeDb(db);
+  flash(req, "success", pendingStudents.length + " student registration(s) approved.");
+  res.redirect("/admin/registration-requests");
+});
+
+app.post("/admin/students/approve-all", requireAdmin, (req, res) => {
+  const db = readDb();
+  const pendingStudents = db.students.filter(student => student.accountStatus === "PENDING");
+
+  if (!pendingStudents.length) {
+    flash(req, "error", "There are no pending student registrations to approve.");
+    return res.redirect("/admin/registration-requests");
+  }
+
+  pendingStudents.forEach(student => {
+    student.accountStatus = "ACTIVE";
+    audit(db, req.session.user.username, "STUDENT_APPROVED", student.prn);
+  });
+  writeDb(db);
+  flash(req, "success", "All " + pendingStudents.length + " pending student registration(s) approved.");
+  res.redirect("/admin/registration-requests");
+});
+
 app.post("/admin/students/:prn/approve", requireAdmin, (req, res) => {
   const db = readDb();
   const student = db.students.find(s => s.prn === req.params.prn);
