@@ -157,6 +157,77 @@ app.post("/logout", requireAuth, (req, res) => {
   req.session.destroy(() => res.redirect("/login"));
 });
 
+app.get("/admin/change-password", requireAdmin, (req, res) => {
+  res.render("admin-change-password", {
+    title: "Change Password",
+    error: null
+  });
+});
+
+app.post("/admin/change-password", requireAdmin, loginLimiter, async (req, res, next) => {
+  try {
+    const currentPassword = String(req.body.currentPassword || "");
+    const newPassword = String(req.body.newPassword || "");
+    const confirmPassword = String(req.body.confirmPassword || "");
+    const db = readDb();
+    const username = String(req.session.user.username || "");
+    const admin = db.admins.find(item =>
+      item.active && item.username.toLowerCase() === username.toLowerCase()
+    );
+
+    if (!admin || !admin.passwordHash) {
+      return res.status(404).render("error", {
+        title: "Administrator not found",
+        message: "Your administrator account could not be found. Please contact the system administrator."
+      });
+    }
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).render("admin-change-password", {
+        title: "Change Password",
+        error: "Complete all password fields."
+      });
+    }
+
+    if (!(await bcrypt.compare(currentPassword, admin.passwordHash))) {
+      return res.status(400).render("admin-change-password", {
+        title: "Change Password",
+        error: "Your current password is incorrect."
+      });
+    }
+
+    if (newPassword.length < 10 || newPassword.length > 72) {
+      return res.status(400).render("admin-change-password", {
+        title: "Change Password",
+        error: "The new password must be between 10 and 72 characters."
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).render("admin-change-password", {
+        title: "Change Password",
+        error: "The new password and confirmation do not match."
+      });
+    }
+
+    if (newPassword === currentPassword) {
+      return res.status(400).render("admin-change-password", {
+        title: "Change Password",
+        error: "Choose a new password different from your current password."
+      });
+    }
+
+    admin.passwordHash = await bcrypt.hash(newPassword, 12);
+    audit(db, username, "ADMIN_PASSWORD_CHANGED", "Administrator changed their own password");
+    writeDb(db);
+
+    flash(req, "success", "Your administrator password has been changed successfully.");
+    res.redirect("/admin/change-password");
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.get("/student/profile", requireStudent, (req, res) => {
   const db = readDb();
   const student = currentStudent(db, req);
@@ -387,6 +458,54 @@ app.get("/admin/registration-requests", requireAdmin, (req, res) => {
     pendingRegistrations,
     reviewedRegistrations
   });
+});
+
+app.post("/admin/students/approve-selected", requireAdmin, (req, res) => {
+  const db = readDb();
+  const submitted = req.body.prns;
+  const selectedPrns = [...new Set((Array.isArray(submitted) ? submitted : submitted ? [submitted] : [])
+    .map(value => String(value).trim()).filter(Boolean))];
+
+  if (!selectedPrns.length) {
+    flash(req, "error", "Select at least one pending student to approve.");
+    return res.redirect("/admin/registration-requests");
+  }
+
+  const selectedSet = new Set(selectedPrns);
+  const pendingStudents = db.students.filter(student =>
+    selectedSet.has(student.prn) && student.accountStatus === "PENDING"
+  );
+
+  if (!pendingStudents.length) {
+    flash(req, "error", "No selected students are currently pending approval.");
+    return res.redirect("/admin/registration-requests");
+  }
+
+  pendingStudents.forEach(student => {
+    student.accountStatus = "ACTIVE";
+    audit(db, req.session.user.username, "STUDENT_APPROVED", student.prn);
+  });
+  writeDb(db);
+  flash(req, "success", pendingStudents.length + " student registration(s) approved.");
+  res.redirect("/admin/registration-requests");
+});
+
+app.post("/admin/students/approve-all", requireAdmin, (req, res) => {
+  const db = readDb();
+  const pendingStudents = db.students.filter(student => student.accountStatus === "PENDING");
+
+  if (!pendingStudents.length) {
+    flash(req, "error", "There are no pending student registrations to approve.");
+    return res.redirect("/admin/registration-requests");
+  }
+
+  pendingStudents.forEach(student => {
+    student.accountStatus = "ACTIVE";
+    audit(db, req.session.user.username, "STUDENT_APPROVED", student.prn);
+  });
+  writeDb(db);
+  flash(req, "success", "All " + pendingStudents.length + " pending student registration(s) approved.");
+  res.redirect("/admin/registration-requests");
 });
 
 app.post("/admin/students/:prn/approve", requireAdmin, (req, res) => {
