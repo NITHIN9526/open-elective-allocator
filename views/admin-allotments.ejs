@@ -5,6 +5,7 @@
     <span class="eyebrow">ADMINISTRATION</span>
     <h1>Allotment Review</h1>
     <p class="text-muted">Status: <span class="badge badge-info"><%= status %></span></p>
+    <p class="text-muted mt-sm"><strong>Allocation priority:</strong> CGPA above 8.00 first, then CGPA 8.00 or below. Higher CGPA gets priority; equal CGPA is resolved by PRN order. Each student is checked against their preferences from 1st onward.</p>
   </div>
   <a href="/admin" class="btn btn-secondary">← Back to dashboard</a>
 </div>
@@ -55,7 +56,7 @@
   </div>
   <div class="card mt-md">
     <div class="card-body text-sm text-muted">
-      <strong>⚠️ Review note:</strong> Equal CGPA records are flagged for human review. The demo's deterministic ordering must not be treated as an official tie-break rule.
+      <strong>Allocation rule:</strong> Students with CGPA above 8.00 are considered before students with CGPA 8.00 or below. Within each group, higher CGPA is considered first; students with equal CGPA are ordered by PRN. The allocator assigns the first available course in each student's preference order.
     </div>
   </div>
 <% } %>
