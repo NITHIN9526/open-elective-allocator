@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const config = require("./src/config");
 const { readDb, writeDb, seedDatabase, audit } = require("./src/store");
 const { requireAuth, requireStudent, requireAdmin, csrf } = require("./src/middleware");
+const { updateStudentProfile } = require("./src/googleSheets");
 
 seedDatabase(false);
 const app = express();
@@ -38,6 +39,28 @@ app.use((req, res, next) => {
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false });
 function flash(req, type, message) { req.session.flash = { type, message }; }
 function currentStudent(db, req) { return db.students.find(s => s.prn === req.session.user.prn); }
+
+function requireCompletedProfile(req, res, next) {
+  const db = readDb();
+  const student = currentStudent(db, req);
+
+  if (!student) {
+    return res.status(404).render("error", {
+      title: "Student not found",
+      message: "Your student record could not be found. Please contact the administrator."
+    });
+  }
+
+  if (student.accountStatus !== "ACTIVE") {
+    return res.redirect("/student/login");
+  }
+
+  if (student.profileCompleted !== true) {
+    return res.redirect("/student/profile");
+  }
+
+  next();
+}
 
 app.get("/", (req, res) => res.redirect(req.session.user ? (req.session.user.role === "STUDENT" ? "/student" : "/admin") : "/login"));
 
@@ -95,7 +118,7 @@ function authenticateAccount(req, res, next, accountType) {
         : { role: admin.role === "SUPER_ADMIN" ? "SUPER_ADMIN" : "ADMIN", username: admin.username, name: admin.name };
       req.session.save(saveErr => {
         if (saveErr) return next(saveErr);
-        res.redirect(isStudentLogin ? "/student" : "/admin");
+        res.redirect(isStudentLogin ? (student.profileCompleted === true ? "/student" : "/student/profile") : "/admin");
       });
     });
   })().catch(next);
@@ -134,7 +157,103 @@ app.post("/logout", requireAuth, (req, res) => {
   req.session.destroy(() => res.redirect("/login"));
 });
 
-app.get("/student", requireStudent, (req, res) => {
+app.get("/student/profile", requireStudent, (req, res) => {
+  const db = readDb();
+  const student = currentStudent(db, req);
+
+  if (!student || student.accountStatus !== "ACTIVE") {
+    return res.status(403).render("error", {
+      title: "Access denied",
+      message: "An approved student account is required."
+    });
+  }
+
+  res.render("student-profile", {
+    title: "Complete Student Profile",
+    student,
+    formData: student.profileCompleted ? {
+      mobile: student.mobile || "",
+      email: student.email || "",
+      cgpa: student.cgpa ?? "",
+      semester: student.semester ?? "",
+      academicYear: student.academicYear || ""
+    } : {},
+    error: null
+  });
+});
+
+app.post("/student/profile", requireStudent, loginLimiter, async (req, res) => {
+  const db = readDb();
+  const student = currentStudent(db, req);
+
+  if (!student || student.accountStatus !== "ACTIVE") {
+    return res.status(403).render("error", {
+      title: "Access denied",
+      message: "Only approved students can complete their profiles."
+    });
+  }
+
+  const mobile = String(req.body.mobile || "").replace(/[\s-]/g, "");
+  const email = String(req.body.email || "").trim().toLowerCase();
+  const cgpaInput = String(req.body.cgpa || "").trim();
+  const semesterInput = String(req.body.semester || "").trim();
+  const academicYear = String(req.body.academicYear || "").trim();
+  const cgpa = Number(cgpaInput);
+  const semester = Number(semesterInput);
+  const formData = { mobile, email, cgpa: cgpaInput, semester: semesterInput, academicYear };
+
+  let error = null;
+  if (!/^(?:\+91)?[6-9]\d{9}$/.test(mobile)) {
+    error = "Enter a valid 10-digit Indian mobile number, optionally with +91.";
+  } else if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    error = "Enter a valid email address.";
+  } else if (cgpaInput === "" || !Number.isFinite(cgpa) || cgpa < 0 || cgpa > 10 ||
+      !/^\d{1,2}(\.\d{1,2})?$/.test(cgpaInput)) {
+    error = "Enter a valid CGPA between 0 and 10, with up to two decimal places.";
+  } else if (!/^[1-6]$/.test(semesterInput)) {
+    error = "Enter a valid semester between 1 and 6.";
+  } else if (!/^\d{4}-\d{2}$/.test(academicYear) ||
+      Number(academicYear.slice(5)) !== (Number(academicYear.slice(0, 4)) + 1) % 100) {
+    error = "Enter the academic year in YYYY-YY format, for example 2026-27.";
+  }
+
+  if (error) {
+    return res.status(400).render("student-profile", {
+      title: "Complete Student Profile", student, formData, error
+    });
+  }
+
+  try {
+    const sheetResult = await updateStudentProfile({
+      prn: student.prn, mobile, email, cgpa, semester, academicYear
+    });
+
+    student.mobile = mobile;
+    student.email = email;
+    student.cgpa = cgpa;
+    student.semester = semester;
+    student.academicYear = academicYear;
+    student.profileCompleted = true;
+    student.profileUpdatedAt = sheetResult.updatedAt;
+
+    audit(db, student.prn, "STUDENT_PROFILE_COMPLETED",
+      "Student profile saved and synchronized with Google Sheets.");
+    writeDb(db);
+
+    flash(req, "success", "Your profile has been saved and synchronized successfully.");
+    return res.redirect("/student");
+  } catch (err) {
+    console.error("Student profile synchronization failed:", err.message);
+    return res.status(502).render("student-profile", {
+      title: "Complete Student Profile",
+      student,
+      formData,
+      error: "We could not synchronize your profile with the student roster. Check that your PRN exists exactly once in the Students sheet, then try again."
+    });
+  }
+});
+
+app.get("/student", requireStudent, requireCompletedProfile, (req, res) => {
   const db = readDb();
   const student = currentStudent(db, req);
   const prefs = db.preferences.filter(p => p.prn === student.prn).sort((a,b) => a.rank - b.rank);
@@ -142,7 +261,7 @@ app.get("/student", requireStudent, (req, res) => {
   res.render("student-dashboard", { title: "Student dashboard", student, courses: db.courses, preferences: prefs, allotment, preferencesOpen: db.meta.preferencesOpen });
 });
 
-app.post("/student/preferences", requireStudent, (req, res) => {
+app.post("/student/preferences", requireStudent, requireCompletedProfile, (req, res) => {
   const db = readDb();
   if (!db.meta.preferencesOpen) { flash(req, "error", "Preference submission is currently closed."); return res.redirect("/student"); }
   const student = currentStudent(db, req);
@@ -374,7 +493,7 @@ app.get("/admin/audit", requireAdmin, (req, res) => {
   res.render("admin-audit", { title: "Audit log", entries: db.audit });
 });
 
-app.get("/student/result", requireStudent, (req, res) => {
+app.get("/student/result", requireStudent, requireCompletedProfile, (req, res) => {
   const db = readDb();
   const result = db.allotments.find(a => a.prn === req.session.user.prn);
   const course = result && result.courseId ? db.courses.find(c => c.id === result.courseId) : null;
