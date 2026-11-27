@@ -158,7 +158,7 @@
           <span class="badge badge-info"><%= db.meta.allocationStatus %></span>
         </div>
         <div class="mt-md" style="display:grid;gap:10px;">
-          <form method="post" action="/admin/preferences/toggle"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-secondary btn-full"><%= db.meta.preferencesOpen ? '<svg class="icon" aria-hidden="true"><use href="/icons.svg#lock"></use></svg> Close preferences' : '<svg class="icon" aria-hidden="true"><use href="/icons.svg#unlock"></use></svg> Reopen preferences' %></button></form>
+          <form method="post" action="/admin/preferences/toggle"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-secondary btn-full"><%- db.meta.preferencesOpen ? '<svg class="icon" aria-hidden="true"><use href="/icons.svg#lock"></use></svg> Close preferences' : '<svg class="icon" aria-hidden="true"><use href="/icons.svg#unlock"></use></svg> Reopen preferences' %></button></form>
           <form method="post" action="/admin/allocation/run" onsubmit="return confirm('Generate provisional allotments? Existing results will be replaced.');"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-primary btn-full" <%= db.meta.preferencesOpen ? 'disabled' : '' %>><svg class="icon" aria-hidden="true"><use href="/icons.svg#zap"></use></svg> Run merit allocation</button></form>
           <a class="btn btn-secondary btn-full" href="/admin/allotments"><svg class="icon" aria-hidden="true"><use href="/icons.svg#chart"></use></svg> Review allotments</a>
         </div>
@@ -170,10 +170,10 @@
       <div class="card-header"><h2>Quick Actions</h2></div>
       <div class="card-body" style="padding:8px 10px;">
         <div class="action-list">
-          <a href="/admin/students" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#users"></use></svg></span> Manage students <span class="action-arrow">→</span></a>
-          <a href="/admin/courses" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#book"></use></svg></span> Edit course capacity <span class="action-arrow">→</span></a>
-          <a href="/admin/preferences" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#list"></use></svg></span> View all preferences <span class="action-arrow">→</span></a>
-          <a href="/admin/audit" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#file"></use></svg></span> Full audit log <span class="action-arrow">→</span></a>
+          <a href="/admin/students" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#users"></use></svg></span> Manage students <span class="action-arrow"><svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></span></a>
+          <a href="/admin/courses" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#book"></use></svg></span> Edit course capacity <span class="action-arrow"><svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></span></a>
+          <a href="/admin/preferences" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#list"></use></svg></span> View all preferences <span class="action-arrow"><svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></span></a>
+          <a href="/admin/audit" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#file"></use></svg></span> Full audit log <span class="action-arrow"><svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></span></a>
         </div>
       </div>
     </div>
