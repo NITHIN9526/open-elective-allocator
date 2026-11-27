@@ -1,0 +1,77 @@
+<%- include("partials/header", { title }) %>
+
+<div class="heading-row">
+  <div class="page-heading">
+    <span class="eyebrow">ADMINISTRATION</span>
+    <h1>Student Registration Approvals</h1>
+    <p class="text-muted">Approve or reject first-time student registrations before students can access the portal.</p>
+  </div>
+  <div class="badge badge-warning"><%= pendingRegistrations.length %> pending</div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Pending registrations</h2>
+    <span class="text-muted text-xs"><%= pendingRegistrations.length %> awaiting review</span>
+  </div>
+  <div class="card-body flush">
+    <% if (!pendingRegistrations.length) { %>
+      <div class="empty">No pending student registrations.</div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>PRN</th><th>Student name</th><th>Department</th><th>Registration date</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <% pendingRegistrations.forEach(student => { %>
+              <tr>
+                <td><code><%= student.prn %></code></td>
+                <td><strong><%= student.name %></strong></td>
+                <td><%= student.department %></td>
+                <td><%= student.createdAt ? new Date(student.createdAt).toLocaleString() : "—" %></td>
+                <td>
+                  <div class="approval-actions">
+                    <form method="post" action="/admin/students/<%= encodeURIComponent(student.prn) %>/approve">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button class="btn btn-success btn-sm">Approve</button>
+                    </form>
+                    <form method="post" action="/admin/students/<%= encodeURIComponent(student.prn) %>/reject" onsubmit="return confirm('Reject this student registration?');">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button class="btn btn-danger btn-sm">Reject</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<% if (reviewedRegistrations.length) { %>
+  <div class="card">
+    <div class="card-header"><h2>Recently processed registrations</h2></div>
+    <div class="card-body flush">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>PRN</th><th>Student name</th><th>Department</th><th>Status</th></tr></thead>
+          <tbody>
+            <% reviewedRegistrations.forEach(student => { %>
+              <tr>
+                <td><code><%= student.prn %></code></td>
+                <td><%= student.name %></td>
+                <td><%= student.department %></td>
+                <td><span class="badge <%= student.accountStatus === 'ACTIVE' ? 'badge-success' : 'badge-danger' %>"><%= student.accountStatus %></span></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<%- include("partials/footer") %>

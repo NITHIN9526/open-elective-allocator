@@ -90,6 +90,8 @@ async function updateStudentProfile(profile) {
   const updatedAt = new Date().toISOString();
 
   const updates = {
+    ...(headers.includes("Name") && profile.name !== undefined ? { Name: profile.name } : {}),
+    ...(headers.includes("Department") && profile.department !== undefined ? { Department: profile.department } : {}),
     Mobile: profile.mobile,
     Email: profile.email,
     CGPA: profile.cgpa,

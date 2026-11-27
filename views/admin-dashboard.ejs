@@ -15,7 +15,7 @@
 <!-- KPI Stat Cards -->
 <div class="stats-row">
   <div class="stat-card blue">
-    <div class="stat-icon">👥</div>
+    <div class="stat-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#users"></use></svg></div>
     <div class="stat-info">
       <span class="stat-value" data-count="<%= stats.totalStudents %>"><%= stats.totalStudents %></span>
       <span class="stat-label">Total Students</span>
@@ -23,7 +23,7 @@
     </div>
   </div>
   <div class="stat-card amber">
-    <div class="stat-icon">⏳</div>
+    <div class="stat-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#clock"></use></svg></div>
     <div class="stat-info">
       <span class="stat-value" data-count="<%= stats.pending %>"><%= stats.pending %></span>
       <span class="stat-label">Pending Approvals</span>
@@ -31,7 +31,7 @@
     </div>
   </div>
   <div class="stat-card green">
-    <div class="stat-icon">✅</div>
+    <div class="stat-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#check-circle"></use></svg></div>
     <div class="stat-info">
       <span class="stat-value" data-count="<%= stats.active %>"><%= stats.active %></span>
       <span class="stat-label">Active Accounts</span>
@@ -39,7 +39,7 @@
     </div>
   </div>
   <div class="stat-card purple">
-    <div class="stat-icon">📝</div>
+    <div class="stat-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#clipboard"></use></svg></div>
     <div class="stat-info">
       <span class="stat-value" data-count="<%= stats.totalPreferences %>"><%= stats.totalPreferences %></span>
       <span class="stat-label">Total Preferences</span>
@@ -118,11 +118,11 @@
     <div class="card">
       <div class="card-header">
         <h2>Pending Approvals</h2>
-        <a href="/admin/students" class="btn btn-ghost btn-sm">All students →</a>
+        <a href="/admin/registration-requests" class="btn btn-ghost btn-sm">Review registrations <svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></a>
       </div>
       <div class="card-body">
         <% if (!pending.length) { %>
-          <div class="empty">No pending registrations 🎉</div>
+          <div class="empty">No registrations are waiting for review.</div>
         <% } else { %>
           <% pending.forEach(s => { %>
           <div class="approval-item">
@@ -158,9 +158,9 @@
           <span class="badge badge-info"><%= db.meta.allocationStatus %></span>
         </div>
         <div class="mt-md" style="display:grid;gap:10px;">
-          <form method="post" action="/admin/preferences/toggle"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-secondary btn-full"><%= db.meta.preferencesOpen ? '🔒 Close preferences' : '🔓 Reopen preferences' %></button></form>
-          <form method="post" action="/admin/allocation/run" onsubmit="return confirm('Generate provisional allotments? Existing results will be replaced.');"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-primary btn-full" <%= db.meta.preferencesOpen ? 'disabled' : '' %>>⚡ Run merit allocation</button></form>
-          <a class="btn btn-secondary btn-full" href="/admin/allotments">📊 Review allotments</a>
+          <form method="post" action="/admin/preferences/toggle"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-secondary btn-full"><%- db.meta.preferencesOpen ? '<svg class="icon" aria-hidden="true"><use href="/icons.svg#lock"></use></svg> Close preferences' : '<svg class="icon" aria-hidden="true"><use href="/icons.svg#unlock"></use></svg> Reopen preferences' %></button></form>
+          <form method="post" action="/admin/allocation/run" onsubmit="return confirm('Generate provisional allotments? Existing results will be replaced.');"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-primary btn-full" <%= db.meta.preferencesOpen ? 'disabled' : '' %>><svg class="icon" aria-hidden="true"><use href="/icons.svg#zap"></use></svg> Run merit allocation</button></form>
+          <a class="btn btn-secondary btn-full" href="/admin/allotments"><svg class="icon" aria-hidden="true"><use href="/icons.svg#chart"></use></svg> Review allotments</a>
         </div>
       </div>
     </div>
@@ -170,10 +170,10 @@
       <div class="card-header"><h2>Quick Actions</h2></div>
       <div class="card-body" style="padding:8px 10px;">
         <div class="action-list">
-          <a href="/admin/students" class="action-link"><span class="action-icon">👥</span> Manage students <span class="action-arrow">→</span></a>
-          <a href="/admin/courses" class="action-link"><span class="action-icon">📚</span> Edit course capacity <span class="action-arrow">→</span></a>
-          <a href="/admin/preferences" class="action-link"><span class="action-icon">📋</span> View all preferences <span class="action-arrow">→</span></a>
-          <a href="/admin/audit" class="action-link"><span class="action-icon">📜</span> Full audit log <span class="action-arrow">→</span></a>
+          <a href="/admin/students" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#users"></use></svg></span> Manage students <span class="action-arrow"><svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></span></a>
+          <a href="/admin/courses" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#book"></use></svg></span> Edit course capacity <span class="action-arrow"><svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></span></a>
+          <a href="/admin/preferences" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#list"></use></svg></span> View all preferences <span class="action-arrow"><svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></span></a>
+          <a href="/admin/audit" class="action-link"><span class="action-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#file"></use></svg></span> Full audit log <span class="action-arrow"><svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-right"></use></svg></span></a>
         </div>
       </div>
     </div>

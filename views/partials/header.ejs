@@ -25,29 +25,38 @@
     <nav class="sidebar-nav">
       <div class="sidebar-section">Main</div>
       <a href="/admin" class="<%= currentPath === '/admin' ? 'active' : '' %>">
-        <span class="nav-icon">📊</span> Dashboard
+        <span class="nav-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#dashboard"></use></svg></span> Dashboard
       </a>
-      <a href="/admin/students" class="<%= currentPath === '/admin/students' ? 'active' : '' %>">
-        <span class="nav-icon">👥</span> Students
+      <a href="/admin/registration-requests" class="<%= currentPath.startsWith('/admin/registration-requests') ? 'active' : '' %>">
+        <span class="nav-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#check-circle"></use></svg></span> Registration Approvals
+      </a>
+      <a href="/admin/students" class="<%= currentPath.startsWith('/admin/students') ? 'active' : '' %>">
+        <span class="nav-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#users"></use></svg></span> Students
+      </a>
+      <a href="/admin/profile-requests" class="<%= currentPath.startsWith('/admin/profile-requests') ? 'active' : '' %>">
+        <span class="nav-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#mail"></use></svg></span> Profile Update Requests
       </a>
       <a href="/admin/courses" class="<%= currentPath === '/admin/courses' ? 'active' : '' %>">
-        <span class="nav-icon">📚</span> Courses
+        <span class="nav-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#book"></use></svg></span> Courses
       </a>
       <div class="sidebar-section">Allocation</div>
       <a href="/admin/preferences" class="<%= currentPath === '/admin/preferences' ? 'active' : '' %>">
-        <span class="nav-icon">📋</span> Preferences
+        <span class="nav-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#list"></use></svg></span> Preferences
+      </a>
+      <a href="/admin/manual-allocation" class="<%= currentPath.startsWith('/admin/manual-allocation') ? 'active' : '' %>">
+        <span class="nav-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#edit"></use></svg></span> Manual Allocation
       </a>
       <a href="/admin/allotments" class="<%= currentPath === '/admin/allotments' ? 'active' : '' %>">
-        <span class="nav-icon">🏷️</span> Allotments
+        <span class="nav-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#award"></use></svg></span> Allotments
       </a>
       <a href="/admin/audit" class="<%= currentPath === '/admin/audit' ? 'active' : '' %>">
-        <span class="nav-icon">📜</span> Audit Log
+        <span class="nav-icon"><svg class="icon" aria-hidden="true"><use href="/icons.svg#file"></use></svg></span> Audit Log
       </a>
     </nav>
     <div class="sidebar-footer">
       <form method="post" action="/logout" class="inline">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <button class="btn btn-secondary btn-full btn-sm">Sign out</button>
+        <button class="btn btn-secondary btn-full btn-sm"><svg class="icon" aria-hidden="true"><use href="/icons.svg#logout"></use></svg>Sign out</button>
       </form>
     </div>
   </aside>
@@ -56,7 +65,7 @@
     <!-- Admin Topbar -->
     <header class="topbar">
       <div class="topbar-left">
-        <button class="sidebar-toggle" aria-label="Toggle menu">☰</button>
+        <button class="sidebar-toggle" aria-label="Toggle menu"><svg class="icon" aria-hidden="true"><use href="/icons.svg#menu"></use></svg></button>
         <span class="topbar-title"><%= title %></span>
       </div>
       <div class="topbar-right">

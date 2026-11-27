@@ -1,0 +1,80 @@
+<%- include("partials/header", { title }) %>
+
+<div class="heading-row">
+  <div class="page-heading">
+    <span class="eyebrow">ADMINISTRATION</span>
+    <h1>Manual Course Allocation</h1>
+    <p class="text-muted">Assign or change a course for any active student. Each saved manual allocation is immediately approved.</p>
+  </div>
+  <a href="/admin/allotments" class="btn btn-secondary">View allotment results</a>
+</div>
+
+<div class="card mb-md">
+  <div class="card-header"><h2>Course capacity</h2></div>
+  <div class="card-body">
+    <div class="stats-row">
+      <% courses.forEach(course => { %>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label"><%= course.name %></span>
+            <span class="stat-value"><%= course.used %> / <%= course.capacity %></span>
+            <span class="stat-sub"><%= Math.max(0, course.capacity - course.used) %> seats available</span>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2>Active students</h2>
+    <span class="badge badge-info"><%= students.length %> students</span>
+  </div>
+  <div class="card-body flush">
+    <% if (!students.length) { %>
+      <div class="empty">No active student accounts are available for allocation.</div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>PRN</th><th>Student</th><th>Department</th><th>CGPA</th><th>Current course</th><th>Assign / Update course</th></tr></thead>
+          <tbody>
+            <% students.forEach(student => { %>
+              <tr>
+                <td><code><%= student.prn %></code></td>
+                <td><strong><%= student.name %></strong></td>
+                <td><%= student.department %></td>
+                <td><%= Number(student.cgpa || 0).toFixed(2) %></td>
+                <td>
+                  <% const currentCourse = courses.find(course => student.allotment && course.id === student.allotment.courseId); %>
+                  <% if (currentCourse) { %>
+                    <strong><%= currentCourse.name %></strong>
+                    <small><%= student.allotment.status %></small>
+                  <% } else { %>
+                    <span class="text-muted">Not allocated</span>
+                  <% } %>
+                </td>
+                <td>
+                  <form method="post" action="/admin/manual-allocation/<%= encodeURIComponent(student.prn) %>" style="display:flex;gap:8px;align-items:center;min-width:260px;">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <select name="courseId" style="min-width:170px;">
+                      <option value="">Not allocated</option>
+                      <% courses.forEach(course => { %>
+                        <option value="<%= course.id %>" <%= student.allotment && student.allotment.courseId === course.id ? "selected" : "" %>>
+                          <%= course.name %> (<%= course.used - (student.allotment && student.allotment.courseId === course.id && ["PROPOSED","APPROVED"].includes(student.allotment.status) ? 1 : 0) %>/<%= course.capacity %>)
+                        </option>
+                      <% }) %>
+                    </select>
+                    <button class="btn btn-primary btn-sm">Save</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include("partials/footer") %>
