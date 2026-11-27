@@ -373,6 +373,22 @@ app.get("/admin", requireAdmin, (req, res) => {
   res.render("admin-dashboard", { title: "Admin dashboard", db, pending, stats, deptStats, courseStats, recentAudit });
 });
 
+app.get("/admin/registration-requests", requireAdmin, (req, res) => {
+  const db = readDb();
+  const pendingRegistrations = db.students
+    .filter(student => student.accountStatus === "PENDING")
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  const reviewedRegistrations = db.students
+    .filter(student => ["ACTIVE", "REJECTED"].includes(student.accountStatus) && student.createdAt)
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+    .slice(0, 50);
+  res.render("admin-registration-requests", {
+    title: "Student Registration Approvals",
+    pendingRegistrations,
+    reviewedRegistrations
+  });
+});
+
 app.post("/admin/students/:prn/approve", requireAdmin, (req, res) => {
   const db = readDb();
   const student = db.students.find(s => s.prn === req.params.prn);
