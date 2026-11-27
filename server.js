@@ -169,8 +169,9 @@ app.get("/student/profile", requireStudent, (req, res) => {
   }
 
   res.render("student-profile", {
-    title: "Complete Student Profile",
+    title: "Student Profile",
     student,
+    pendingRequest: (db.profileRequests || []).find(r => r.prn === student.prn && r.status === "PENDING") || null,
     formData: student.profileCompleted ? {
       mobile: student.mobile || "",
       email: student.email || "",
@@ -187,10 +188,11 @@ app.post("/student/profile", requireStudent, loginLimiter, async (req, res) => {
   const student = currentStudent(db, req);
 
   if (!student || student.accountStatus !== "ACTIVE") {
-    return res.status(403).render("error", {
-      title: "Access denied",
-      message: "Only approved students can complete their profiles."
-    });
+    return res.status(403).render("error", { title: "Access denied", message: "Only approved students can complete their profiles." });
+  }
+  if (student.profileCompleted === true) {
+    flash(req, "error", "Your profile is locked after submission. Send an update request to the administrator.");
+    return res.redirect("/student/profile");
   }
 
   const mobile = String(req.body.mobile || "").replace(/[\s-]/g, "");
@@ -251,6 +253,39 @@ app.post("/student/profile", requireStudent, loginLimiter, async (req, res) => {
       error: "We could not synchronize your profile with the student roster. Check that your PRN exists exactly once in the Students sheet, then try again."
     });
   }
+});
+
+app.post("/student/profile/request", requireStudent, requireCompletedProfile, loginLimiter, (req, res) => {
+  const db = readDb();
+  const student = currentStudent(db, req);
+  const details = String(req.body.details || "").trim();
+  if (!details || details.length < 10 || details.length > 1000) {
+    flash(req, "error", "Explain the correction needed (10–1000 characters).");
+    return res.redirect("/student/profile");
+  }
+  db.profileRequests ||= [];
+  const existing = db.profileRequests.find(r => r.prn === student.prn && r.status === "PENDING");
+  if (existing) {
+    flash(req, "error", "You already have a pending profile update request.");
+    return res.redirect("/student/profile");
+  }
+  const request = {
+    id: db.counters.profileRequest = (db.counters.profileRequest || 1),
+    prn: student.prn,
+    studentName: student.name,
+    details,
+    status: "PENDING",
+    requestedAt: new Date().toISOString(),
+    reviewedAt: null,
+    reviewedBy: null,
+    decisionNote: ""
+  };
+  db.counters.profileRequest = request.id + 1;
+  db.profileRequests.push(request);
+  audit(db, student.prn, "PROFILE_UPDATE_REQUESTED", details);
+  writeDb(db);
+  flash(req, "success", "Your update request has been sent to the administrator.");
+  res.redirect("/student/profile");
 });
 
 app.get("/student", requireStudent, requireCompletedProfile, (req, res) => {
@@ -364,6 +399,70 @@ app.post("/admin/students/:prn/reject", requireAdmin, (req, res) => {
 app.get("/admin/students", requireAdmin, (req, res) => {
   const db = readDb();
   res.render("admin-students", { title: "Student management", students: db.students });
+});
+
+app.get("/admin/profile-requests", requireAdmin, (req, res) => {
+  const db = readDb();
+  const requests = (db.profileRequests || []).slice().sort((a,b) => new Date(b.requestedAt) - new Date(a.requestedAt));
+  res.render("admin-profile-requests", { title: "Profile Update Requests", requests });
+});
+
+app.post("/admin/profile-requests/:id/:decision", requireAdmin, (req, res) => {
+  const db = readDb();
+  const request = (db.profileRequests || []).find(r => String(r.id) === String(req.params.id));
+  if (!request || request.status !== "PENDING" || !["approve", "reject"].includes(req.params.decision)) {
+    flash(req, "error", "Request not found or already reviewed.");
+    return res.redirect("/admin/profile-requests");
+  }
+  request.status = req.params.decision === "approve" ? "APPROVED" : "REJECTED";
+  request.reviewedAt = new Date().toISOString();
+  request.reviewedBy = req.session.user.username;
+  request.decisionNote = String(req.body.note || "").trim().slice(0, 500);
+  audit(db, req.session.user.username, "PROFILE_UPDATE_REQUEST_" + request.status, request.prn + ": " + request.details);
+  writeDb(db);
+  flash(req, "success", "Profile update request " + request.status.toLowerCase() + ". " + (request.status === "APPROVED" ? "Now edit the student's record from Student Management." : ""));
+  res.redirect("/admin/profile-requests");
+});
+
+app.get("/admin/students/:prn/edit", requireAdmin, (req, res) => {
+  const db = readDb();
+  const student = db.students.find(s => s.prn === req.params.prn);
+  if (!student) { flash(req, "error", "Student not found."); return res.redirect("/admin/students"); }
+  res.render("admin-student-edit", { title: "Edit Student", student, error: null });
+});
+
+app.post("/admin/students/:prn/edit", requireAdmin, loginLimiter, async (req, res) => {
+  const db = readDb();
+  const student = db.students.find(s => s.prn === req.params.prn);
+  if (!student) { flash(req, "error", "Student not found."); return res.redirect("/admin/students"); }
+  const mobile = String(req.body.mobile || "").replace(/[\\s-]/g, "");
+  const email = String(req.body.email || "").trim().toLowerCase();
+  const cgpaInput = String(req.body.cgpa || "").trim();
+  const semesterInput = String(req.body.semester || "").trim();
+  const academicYear = String(req.body.academicYear || "").trim();
+  const name = String(req.body.name || "").trim();
+  const department = String(req.body.department || "").trim().toUpperCase();
+  const cgpa = Number(cgpaInput), semester = Number(semesterInput);
+  let error = null;
+  if (!name || name.length > 120) error = "Enter a valid student name.";
+  else if (!db.departments.some(d => d.code === department)) error = "Select a valid department.";
+  else if (!/^(?:\\+91)?[6-9]\\d{9}$/.test(mobile)) error = "Enter a valid Indian mobile number.";
+  else if (email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) error = "Enter a valid email address.";
+  else if (!Number.isFinite(cgpa) || cgpa < 0 || cgpa > 10) error = "CGPA must be between 0 and 10.";
+  else if (!/^[1-6]$/.test(semesterInput)) error = "Semester must be between 1 and 6.";
+  else if (!/^\\d{4}-\\d{2}$/.test(academicYear) || Number(academicYear.slice(5)) !== (Number(academicYear.slice(0,4))+1)%100) error = "Use academic year format YYYY-YY.";
+  if (error) return res.status(400).render("admin-student-edit", { title: "Edit Student", student: { ...student, name, department, mobile, email, cgpa: cgpaInput, semester: semesterInput, academicYear }, error });
+  try {
+    const sheetResult = await updateStudentProfile({ prn: student.prn, name, department, mobile, email, cgpa, semester, academicYear });
+    Object.assign(student, { name, department, mobile, email, cgpa, semester, academicYear, profileCompleted: true, profileUpdatedAt: sheetResult.updatedAt });
+    audit(db, req.session.user.username, "ADMIN_STUDENT_PROFILE_EDITED", student.prn + " profile updated");
+    writeDb(db);
+    flash(req, "success", "Student record updated in the portal and Google Sheets.");
+    res.redirect("/admin/students");
+  } catch (err) {
+    console.error("Admin student update sync failed:", err.message);
+    return res.status(502).render("admin-student-edit", { title: "Edit Student", student, error: "Google Sheets update failed. No local changes were saved. Check the Students sheet headers and PRN." });
+  }
 });
 
 app.get("/admin/courses", requireAdmin, (req, res) => {
