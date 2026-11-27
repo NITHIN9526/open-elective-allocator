@@ -1,0 +1,87 @@
+<%- include("partials/header", { title }) %>
+
+<div class="page-heading">
+  <span class="eyebrow">STUDENT PROFILE</span>
+  <h1><%= student.profileCompleted ? "Update Your Profile" : "Complete Your Profile" %></h1>
+  <p class="text-muted">Confirm your contact details and current academic information.</p>
+</div>
+
+<div class="card" style="max-width:680px;margin:24px auto;">
+  <div class="card-header">
+    <div>
+      <h2>Student Information</h2>
+      <p class="text-muted">All fields are required.</p>
+    </div>
+    <span class="badge <%= student.profileCompleted ? 'badge-success' : 'badge-warning' %>">
+      <%= student.profileCompleted ? "Completed" : "Incomplete" %>
+    </span>
+  </div>
+
+  <div class="card-body">
+    <% if (error) { %>
+      <div class="alert error" role="alert"><%= error %></div>
+    <% } %>
+
+    <div style="margin-bottom:22px;padding:14px;background:var(--gray-100);border-radius:8px;">
+      <strong><%= student.name %></strong>
+      <div class="text-muted">PRN: <%= student.prn %></div>
+      <div class="text-muted">Department: <%= student.department %></div>
+    </div>
+
+    <form method="post" action="/student/profile" class="form-stack">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-group">
+        <label class="form-label" for="mobile">Mobile Number</label>
+        <input class="form-control" id="mobile" name="mobile" type="tel"
+          inputmode="tel" autocomplete="tel" maxlength="13"
+          placeholder="10-digit mobile number"
+          value="<%= formData.mobile || '' %>" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input class="form-control" id="email" name="email" type="email"
+          autocomplete="email" maxlength="254"
+          placeholder="yourname@example.com"
+          value="<%= formData.email || '' %>" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="cgpa">Current CGPA</label>
+        <input class="form-control" id="cgpa" name="cgpa" type="number"
+          min="0" max="10" step="0.01" inputmode="decimal"
+          placeholder="Example: 8.50"
+          value="<%= formData.cgpa ?? '' %>" required>
+        <span class="form-hint">Enter your CGPA on a 10-point scale.</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="semester">Current Semester</label>
+        <select class="form-control" id="semester" name="semester" required>
+          <option value="">Select semester</option>
+          <% for (let i = 1; i <= 6; i++) { %>
+            <option value="<%= i %>" <%= String(formData.semester) === String(i) ? "selected" : "" %>>
+              Semester <%= i %>
+            </option>
+          <% } %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="academicYear">Academic Year</label>
+        <input class="form-control" id="academicYear" name="academicYear"
+          type="text" maxlength="7" pattern="[0-9]{4}-[0-9]{2}"
+          placeholder="2026-27"
+          value="<%= formData.academicYear || config.academicYear %>" required>
+        <span class="form-hint">Format: YYYY-YY, for example 2026-27.</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full">
+        <%= student.profileCompleted ? "Save Profile Changes" : "Save Profile and Continue" %>
+      </button>
+    </form>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

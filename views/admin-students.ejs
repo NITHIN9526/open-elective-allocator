@@ -4,7 +4,7 @@
   <div class="page-heading">
     <span class="eyebrow">ADMINISTRATION</span>
     <h1>Student Management</h1>
-    <p class="text-muted">Complete roster and registration status.</p>
+    <p class="text-muted">Complete roster, registration and profile completion status.</p>
   </div>
   <div class="search-box">
     <span class="search-icon">🔍</span>
@@ -17,7 +17,10 @@
     <div class="table-wrap">
       <table id="students-table">
         <thead>
-          <tr><th>PRN</th><th>Name</th><th>Department</th><th>CGPA</th><th>Status</th></tr>
+          <tr>
+            <th>PRN</th><th>Name</th><th>Department</th><th>CGPA</th>
+            <th>Account Status</th><th>Profile Status</th>
+          </tr>
         </thead>
         <tbody>
           <% students.forEach(s => { %>
@@ -27,6 +30,11 @@
             <td><%= s.department %></td>
             <td><%= Number(s.cgpa).toFixed(2) %></td>
             <td><span class="badge <%= s.accountStatus === 'ACTIVE' ? 'badge-success' : s.accountStatus === 'PENDING' ? 'badge-warning' : s.accountStatus === 'REJECTED' ? 'badge-danger' : 'badge-gray' %>"><%= s.accountStatus %></span></td>
+            <td>
+              <span class="badge <%= s.profileCompleted === true ? 'badge-success' : 'badge-warning' %>">
+                <%= s.profileCompleted === true ? 'COMPLETED' : 'INCOMPLETE' %>
+              </span>
+            </td>
           </tr>
           <% }) %>
         </tbody>
