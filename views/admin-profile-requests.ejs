@@ -1,0 +1,10 @@
+<%- include("partials/header", { title }) %>
+<div class="page-heading"><span class="eyebrow">ADMINISTRATION</span><h1>Profile Update Requests</h1><p class="text-muted">Review student correction requests. After approval, an administrator can edit the student's record.</p></div>
+<div class="card"><div class="card-body">
+<% const pending = requests.filter(r => r.status === "PENDING"); %>
+<% if (!pending.length) { %><div class="empty">No pending profile update requests.</div><% } %>
+<% pending.forEach(r => { %><div class="approval-item" style="align-items:flex-start;gap:16px;padding:18px 0;border-bottom:1px solid var(--gray-200)"><div class="approval-info" style="flex:1"><strong><%= r.studentName %> · <%= r.prn %></strong><small>Requested <%= new Date(r.requestedAt).toLocaleString() %></small><p style="margin-top:10px;white-space:pre-wrap"><%= r.details %></p></div><div class="approval-actions"><form method="post" action="/admin/profile-requests/<%= r.id %>/approve"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-success btn-sm">Approve</button></form><form method="post" action="/admin/profile-requests/<%= r.id %>/reject"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-danger btn-sm">Reject</button></form></div></div><% }) %>
+<% const reviewed = requests.filter(r => r.status !== "PENDING"); %>
+<% if (reviewed.length) { %><h2 style="margin-top:24px">Reviewed requests</h2><% reviewed.forEach(r => { %><div class="activity-item"><strong><%= r.studentName %> · <%= r.prn %></strong> <span class="badge <%= r.status === 'APPROVED' ? 'badge-success' : 'badge-danger' %>"><%= r.status %></span><div><%= r.details %></div><small><%= r.reviewedBy %> · <%= new Date(r.reviewedAt).toLocaleString() %></small></div><% }) %><% } %>
+</div></div>
+<%- include("partials/footer") %>
