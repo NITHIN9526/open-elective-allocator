@@ -3,11 +3,49 @@
 <div class="page-heading">
   <span class="eyebrow">ADMINISTRATION</span>
   <h1>Course Management</h1>
-  <p class="text-muted">Review elective courses and edit seat capacity.</p>
+  <p class="text-muted">Add courses, edit course details and manage seat capacity.</p>
+</div>
+
+<section class="card" style="margin-bottom:24px;">
+  <div class="card-header"><h2>Add a New Course</h2></div>
+  <div class="card-body">
+    <form method="post" action="/admin/courses" class="form-grid">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-group">
+        <label class="form-label" for="new-course-id">Course code</label>
+        <input class="form-control" id="new-course-id" name="id" required maxlength="40" pattern="[A-Za-z0-9][A-Za-z0-9_-]{2,39}" placeholder="OE-CE-502">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="new-course-name">Course name</label>
+        <input class="form-control" id="new-course-name" name="name" required maxlength="120" placeholder="Course title">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="new-course-dept">Offering department</label>
+        <select class="form-control" id="new-course-dept" name="offeredBy" required>
+          <option value="">Select department</option>
+          <% departments.forEach(d => { %><option value="<%= d.code %>"><%= d.code %> — <%= d.name %></option><% }) %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="new-course-capacity">Seat capacity</label>
+        <input class="form-control" id="new-course-capacity" type="number" name="capacity" min="1" max="500" value="65" required>
+      </div>
+      <div class="form-group" style="grid-column:1/-1;">
+        <label class="form-label" for="new-course-description">Description</label>
+        <textarea class="form-control" id="new-course-description" name="description" rows="2" maxlength="500" placeholder="Brief course description"></textarea>
+      </div>
+      <div><button class="btn btn-primary" type="submit">＋ Add Course</button></div>
+    </form>
+  </div>
+</section>
+
+<div class="page-heading">
+  <h2>Existing Courses</h2>
+  <p class="text-muted">Edit the course name, offering department, description and seat capacity.</p>
 </div>
 
 <div class="course-admin-grid">
-  <% courses.forEach(c => { %>
+  <% courses.forEach((c, i) => { %>
   <div class="card course-admin-card">
     <div class="card-body">
       <span class="course-code"><%= c.id %></span>
@@ -15,18 +53,9 @@
       <span class="text-xs text-muted">Offered by <%= c.offeredBy %></span>
 
       <div class="capacity-row">
-        <div class="capacity-num">
-          <span>Allocated</span>
-          <strong><%= c.used %></strong>
-        </div>
-        <div class="capacity-num">
-          <span>Capacity</span>
-          <strong><%= c.capacity %></strong>
-        </div>
-        <div class="capacity-num">
-          <span>Remaining</span>
-          <strong style="color: <%= c.remaining > 0 ? 'var(--success)' : 'var(--danger)' %>"><%= c.remaining %></strong>
-        </div>
+        <div class="capacity-num"><span>Allocated</span><strong><%= c.used %></strong></div>
+        <div class="capacity-num"><span>Capacity</span><strong><%= c.capacity %></strong></div>
+        <div class="capacity-num"><span>Remaining</span><strong style="color:<%= c.remaining > 0 ? 'var(--success)' : 'var(--danger)' %>"><%= c.remaining %></strong></div>
       </div>
 
       <div class="progress-track" style="margin-bottom:8px;">
@@ -35,17 +64,42 @@
       </div>
       <span class="text-xs text-muted"><%= usagePct %>% utilized</span>
 
-      <form method="post" action="/admin/courses/<%= c.id %>/capacity" class="form-row mt-md">
+      <details style="margin-top:16px;">
+        <summary class="btn btn-secondary btn-sm" style="cursor:pointer;display:inline-block;">✎ Edit course details</summary>
+        <form method="post" action="/admin/courses/<%= encodeURIComponent(c.id) %>/edit" style="margin-top:14px;">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="form-group">
+            <label class="form-label">Course name</label>
+            <input class="form-control" name="name" required maxlength="120" value="<%= c.name %>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Offering department</label>
+            <select class="form-control" name="offeredBy" required>
+              <% departments.forEach(d => { %><option value="<%= d.code %>" <%= d.code === c.offeredBy ? 'selected' : '' %>><%= d.code %> — <%= d.name %></option><% }) %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Seat capacity</label>
+            <input class="form-control" type="number" name="capacity" min="<%= Math.max(1,c.used) %>" max="500" value="<%= c.capacity %>" required>
+            <small class="text-muted"><%= c.used %> current proposed/approved allotments.</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="description" rows="2" maxlength="500"><%= c.description || '' %></textarea>
+          </div>
+          <button class="btn btn-primary btn-sm" type="submit">Save course changes</button>
+        </form>
+      </details>
+
+      <form method="post" action="/admin/courses/<%= encodeURIComponent(c.id) %>/delete" style="margin-top:12px;" onsubmit="return confirm('Remove this course? This cannot be undone.');">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <div class="form-group" style="flex:1;">
-          <label class="form-label">Seat limit</label>
-          <input class="form-control" type="number" name="capacity" min="1" max="500" value="<%= c.capacity %>">
-        </div>
-        <button class="btn btn-secondary btn-sm" style="margin-bottom:1px;">Update</button>
+        <button class="btn btn-danger btn-sm" type="submit" <%= c.used > 0 || c.preferenceCount > 0 || c.allotmentCount > 0 ? 'disabled title="Course is in use"' : '' %>>Remove course</button>
+        <% if (c.used > 0 || c.preferenceCount > 0 || c.allotmentCount > 0) { %><small class="text-muted">Course has student records and cannot be removed.</small><% } %>
       </form>
     </div>
   </div>
   <% }) %>
+  <% if (!courses.length) { %><div class="card"><div class="card-body">No courses added yet.</div></div><% } %>
 </div>
 
 <%- include("partials/footer") %>
