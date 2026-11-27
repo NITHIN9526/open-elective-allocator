@@ -428,7 +428,7 @@ app.get("/admin/students/:prn/edit", requireAdmin, (req, res) => {
   const db = readDb();
   const student = db.students.find(s => s.prn === req.params.prn);
   if (!student) { flash(req, "error", "Student not found."); return res.redirect("/admin/students"); }
-  res.render("admin-student-edit", { title: "Edit Student", student, error: null });
+  res.render("admin-student-edit", { title: "Edit Student", student, departments: db.departments, error: null });
 });
 
 app.post("/admin/students/:prn/edit", requireAdmin, loginLimiter, async (req, res) => {
@@ -451,7 +451,7 @@ app.post("/admin/students/:prn/edit", requireAdmin, loginLimiter, async (req, re
   else if (!Number.isFinite(cgpa) || cgpa < 0 || cgpa > 10) error = "CGPA must be between 0 and 10.";
   else if (!/^[1-6]$/.test(semesterInput)) error = "Semester must be between 1 and 6.";
   else if (!/^\\d{4}-\\d{2}$/.test(academicYear) || Number(academicYear.slice(5)) !== (Number(academicYear.slice(0,4))+1)%100) error = "Use academic year format YYYY-YY.";
-  if (error) return res.status(400).render("admin-student-edit", { title: "Edit Student", student: { ...student, name, department, mobile, email, cgpa: cgpaInput, semester: semesterInput, academicYear }, error });
+  if (error) return res.status(400).render("admin-student-edit", { title: "Edit Student", student: { ...student, name, department, mobile, email, cgpa: cgpaInput, semester: semesterInput, academicYear }, departments: db.departments, error });
   try {
     const sheetResult = await updateStudentProfile({ prn: student.prn, name, department, mobile, email, cgpa, semester, academicYear });
     Object.assign(student, { name, department, mobile, email, cgpa, semester, academicYear, profileCompleted: true, profileUpdatedAt: sheetResult.updatedAt });
