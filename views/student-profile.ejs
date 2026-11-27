@@ -2,8 +2,8 @@
 
 <div class="page-heading">
   <span class="eyebrow">STUDENT PROFILE</span>
-  <h1><%= student.profileCompleted ? "Update Your Profile" : "Complete Your Profile" %></h1>
-  <p class="text-muted">Confirm your contact details and current academic information.</p>
+  <h1><%= student.profileCompleted ? "My Profile" : "Complete Your Profile" %></h1>
+  <p class="text-muted"><%= student.profileCompleted ? "Your submitted details are read-only. Request an update if something needs correction." : "Confirm your contact details and current academic information." %></p>
 </div>
 
 <div class="card" style="max-width:680px;margin:24px auto;">
@@ -28,6 +28,7 @@
       <div class="text-muted">Department: <%= student.department %></div>
     </div>
 
+    <% if (!student.profileCompleted) { %>
     <form method="post" action="/student/profile" class="form-stack">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
@@ -81,6 +82,18 @@
         <%= student.profileCompleted ? "Save Profile Changes" : "Save Profile and Continue" %>
       </button>
     </form>
+    <% } else { %>
+      <div class="alert info">Your submitted details are read-only. Students cannot directly edit submitted details.</div>
+      <% if (pendingRequest) { %>
+        <div class="alert info">Your profile update request is pending administrator review.</div>
+      <% } else { %>
+        <form method="post" action="/student/profile/request" class="form-stack">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="form-group"><label class="form-label" for="details">What needs to be corrected?</label><textarea class="form-control" id="details" name="details" rows="4" minlength="10" maxlength="1000" required placeholder="Explain which details are incorrect and provide the corrected information."></textarea></div>
+          <button class="btn btn-primary">Send update request to admin</button>
+        </form>
+      <% } %>
+    <% } %>
   </div>
 </div>
 
