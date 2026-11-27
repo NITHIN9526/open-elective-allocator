@@ -435,7 +435,7 @@ app.post("/admin/students/:prn/edit", requireAdmin, loginLimiter, async (req, re
   const db = readDb();
   const student = db.students.find(s => s.prn === req.params.prn);
   if (!student) { flash(req, "error", "Student not found."); return res.redirect("/admin/students"); }
-  const mobile = String(req.body.mobile || "").replace(/[\\s-]/g, "");
+  const mobile = String(req.body.mobile || "").replace(/[\s-]/g, "");
   const email = String(req.body.email || "").trim().toLowerCase();
   const cgpaInput = String(req.body.cgpa || "").trim();
   const semesterInput = String(req.body.semester || "").trim();
@@ -446,11 +446,11 @@ app.post("/admin/students/:prn/edit", requireAdmin, loginLimiter, async (req, re
   let error = null;
   if (!name || name.length > 120) error = "Enter a valid student name.";
   else if (!db.departments.some(d => d.code === department)) error = "Select a valid department.";
-  else if (!/^(?:\\+91)?[6-9]\\d{9}$/.test(mobile)) error = "Enter a valid Indian mobile number.";
-  else if (email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) error = "Enter a valid email address.";
+  else if (!/^(?:\+91)?[6-9]\d{9}$/.test(mobile)) error = "Enter a valid Indian mobile number.";
+  else if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) error = "Enter a valid email address.";
   else if (!Number.isFinite(cgpa) || cgpa < 0 || cgpa > 10) error = "CGPA must be between 0 and 10.";
   else if (!/^[1-6]$/.test(semesterInput)) error = "Semester must be between 1 and 6.";
-  else if (!/^\\d{4}-\\d{2}$/.test(academicYear) || Number(academicYear.slice(5)) !== (Number(academicYear.slice(0,4))+1)%100) error = "Use academic year format YYYY-YY.";
+  else if (!/^\d{4}-\d{2}$/.test(academicYear) || Number(academicYear.slice(5)) !== (Number(academicYear.slice(0,4))+1)%100) error = "Use academic year format YYYY-YY.";
   if (error) return res.status(400).render("admin-student-edit", { title: "Edit Student", student: { ...student, name, department, mobile, email, cgpa: cgpaInput, semester: semesterInput, academicYear }, departments: db.departments, error });
   try {
     const sheetResult = await updateStudentProfile({ prn: student.prn, name, department, mobile, email, cgpa, semester, academicYear });
@@ -461,7 +461,7 @@ app.post("/admin/students/:prn/edit", requireAdmin, loginLimiter, async (req, re
     res.redirect("/admin/students");
   } catch (err) {
     console.error("Admin student update sync failed:", err.message);
-    return res.status(502).render("admin-student-edit", { title: "Edit Student", student, error: "Google Sheets update failed. No local changes were saved. Check the Students sheet headers and PRN." });
+    return res.status(502).render("admin-student-edit", { title: "Edit Student", student, departments: db.departments, error: "Google Sheets update failed. No local changes were saved. Check the Students sheet headers and PRN." });
   }
 });
 
