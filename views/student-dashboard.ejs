@@ -29,7 +29,7 @@
     </div>
   </div>
   <div class="stat-card <%= preferencesOpen ? 'green' : 'amber' %>">
-    <div class="stat-icon"><%= preferencesOpen ? '<svg class="icon" aria-hidden="true"><use href="/icons.svg#check-circle"></use></svg>' : '<svg class="icon" aria-hidden="true"><use href="/icons.svg#x"></use></svg>' %></div>
+    <div class="stat-icon"><%- preferencesOpen ? '<svg class="icon" aria-hidden="true"><use href="/icons.svg#check-circle"></use></svg>' : '<svg class="icon" aria-hidden="true"><use href="/icons.svg#x"></use></svg>' %></div>
     <div class="stat-info">
       <span class="stat-value"><%= preferencesOpen ? 'Open' : 'Closed' %></span>
       <span class="stat-label">Preference Window</span>
