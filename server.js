@@ -11,8 +11,14 @@ const { requireAuth, requireStudent, requireAdmin, csrf } = require("./src/middl
 seedDatabase(false);
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
-const SESSION_SECRET = process.env.SESSION_SECRET || "LOCAL-ONLY-CHANGE-ME-7d0c5f9b3a1e";
+const SESSION_SECRET = process.env.SESSION_SECRET || "";
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
+if (IS_PRODUCTION && SESSION_SECRET.length < 32) {
+  throw new Error("Production startup blocked: set SESSION_SECRET to a random value of at least 32 characters.");
+}
+
+app.set("trust proxy", IS_PRODUCTION ? 1 : false);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -23,7 +29,7 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: "lax", secure: false, maxAge: config.sessionMaxAgeMs }
+  cookie: { httpOnly: true, sameSite: "lax", secure: IS_PRODUCTION, maxAge: config.sessionMaxAgeMs }
 }));
 app.use(csrf);
 app.use((req, res, next) => {
@@ -775,6 +781,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Open Elective demo running at http://localhost:${PORT}`);
-  console.log("Demo admin: username admin | password Admin@12345");
   console.log("Student demo password is created during registration.");
 });
