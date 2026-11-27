@@ -7,12 +7,12 @@
     <p class="text-muted">Status: <span class="badge badge-info"><%= status %></span></p>
     <p class="text-muted mt-sm"><strong>Allocation priority:</strong> CGPA above 8.00 first, then CGPA 8.00 or below. Higher CGPA gets priority; equal CGPA is resolved by PRN order. Each student is checked against their preferences from 1st onward.</p>
   </div>
-  <a href="/admin" class="btn btn-secondary">← Back to dashboard</a>
+  <a href="/admin" class="btn btn-secondary"><svg class="icon" aria-hidden="true"><use href="/icons.svg#arrow-left"></use></svg> Back to dashboard</a>
 </div>
 
 <% if (!rows.length) { %>
   <div class="card"><div class="empty" style="padding:48px;">
-    <div style="font-size:40px;margin-bottom:12px;">📭</div>
+    <div style="font-size:40px;margin-bottom:12px;"><svg class="icon" aria-hidden="true"><use href="/icons.svg#inbox"></use></svg></div>
     No allocation has been generated yet.
   </div></div>
 <% } else { %>
