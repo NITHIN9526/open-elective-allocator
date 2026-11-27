@@ -1043,3 +1043,133 @@ details[open] > summary { margin-bottom:4px; }
   .topbar { padding:0 16px; }
   .brand-bar { padding:0 16px; }
 }
+
+
+/* ==========================================================
+   Complete mobile pass — every authenticated and public page
+   ========================================================== */
+html, body { max-width:100%; overflow-x:hidden; }
+body, main, section, article, aside, header, footer, form { min-width:0; }
+img, svg, video, canvas { max-width:100%; }
+button, input, select, textarea { max-width:100%; }
+button, .btn, a { touch-action:manipulation; }
+
+@media (max-width: 768px) {
+  /* Admin shell and drawer */
+  body.has-sidebar { display:block; width:100%; }
+  .has-sidebar .sidebar {
+    width:min(290px,86vw); max-width:86vw; height:100dvh;
+    top:0; bottom:0; left:0; transform:translateX(-105%);
+    padding-bottom:env(safe-area-inset-bottom);
+    box-shadow:12px 0 34px rgba(0,0,0,.18);
+  }
+  .has-sidebar .sidebar.open { transform:translateX(0); }
+  .has-sidebar .main-area { width:100%; min-width:0; margin:0; }
+  .has-sidebar .sidebar-overlay { z-index:199; }
+  .has-sidebar .topbar { min-height:58px; height:auto; padding:9px 14px; gap:10px; }
+  .has-sidebar .topbar-left { min-width:0; flex:1; gap:10px; }
+  .has-sidebar .topbar-title { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .has-sidebar .sidebar-toggle {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:42px; height:42px; flex:0 0 42px; padding:0;
+    border-radius:10px; background:#f4f8f3;
+  }
+  .has-sidebar .topbar-right { min-width:0; }
+  .has-sidebar .topbar-user { max-width:34vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .has-sidebar .container { width:100%; max-width:100%; padding:20px 15px 38px; }
+
+  /* Public and student navigation */
+  .brand-bar {
+    width:100%; height:auto; min-height:64px; padding:12px 15px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px;
+  }
+  .brand-link { min-width:0; flex:1 1 100%; }
+  .brand-text { min-width:0; }
+  .brand-nav {
+    width:100%; min-width:0; display:flex; flex-wrap:wrap;
+    align-items:center; justify-content:flex-start; gap:7px;
+  }
+  .brand-nav a, .brand-nav .nav-logout {
+    min-height:40px; display:inline-flex; align-items:center;
+    padding:8px 11px; border-radius:8px; background:#f4f8f3;
+    font-size:13px; white-space:normal;
+  }
+  .brand-nav form { display:inline-flex; margin:0; }
+  .brand-nav .nav-logout { border:0; }
+  .public-brand-bar .brand-link { flex:1 1 100%; }
+
+  /* Page headings, cards and common layout rows */
+  .container { width:100%; max-width:100%; padding:20px 15px 38px; }
+  .page-header { margin:-20px -15px 20px; padding:24px 18px 21px; }
+  .page-header h1, .page-heading h1 { font-size:clamp(21px,5vw,27px); line-height:1.2; overflow-wrap:anywhere; }
+  .page-header-row, .heading-row, .card-header {
+    min-width:0; flex-wrap:wrap; align-items:flex-start; gap:12px;
+  }
+  .page-header-row > *, .heading-row > *, .card-header > * { min-width:0; }
+  .card { min-width:0; max-width:100%; }
+  .card-header { padding:15px 16px; }
+  .card-body { min-width:0; padding:16px; }
+  .card-footer { flex-wrap:wrap; gap:10px; }
+  .stats-row, .stats-row.three { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .dashboard-grid, .course-grid, .course-admin-grid,
+  .form-grid, .login-choice-grid { grid-template-columns:minmax(0,1fr); }
+  .dashboard-aside { grid-template-columns:minmax(0,1fr); }
+  .dashboard-aside > .card:last-child { grid-column:auto; }
+  .form-row, .filter-row, .toolbar, .action-row {
+    width:100%; min-width:0; flex-wrap:wrap; align-items:stretch; gap:10px;
+  }
+  .form-row > *, .filter-row > *, .toolbar > * { min-width:0; flex:1 1 180px; }
+  .form-group, .form-grid .form-group { min-width:0; width:100%; }
+  .form-control, input, select, textarea { min-width:0; }
+  .btn, button.btn { min-height:42px; }
+  .button-group, .actions, .approval-actions { display:flex; flex-wrap:wrap; gap:8px; }
+  .approval-actions { width:100%; }
+  .approval-actions form { flex:1 1 130px; }
+  .approval-actions .btn { width:100%; }
+  .empty, .alert, .notice, .help-text { overflow-wrap:anywhere; }
+
+  /* Tables stay inside their own scroll area instead of widening the page */
+  .table-wrap {
+    display:block; width:100%; max-width:100%; overflow-x:auto;
+    -webkit-overflow-scrolling:touch; overscroll-behavior-inline:contain;
+    border-radius:9px;
+  }
+  .table-wrap table { width:max-content; min-width:680px; max-width:none; }
+  .table-wrap th, .table-wrap td { padding:10px 12px; white-space:normal; }
+  .table-wrap td .btn { white-space:nowrap; }
+  table:not(.table-wrap table) { display:block; width:100%; overflow-x:auto; }
+}
+
+@media (max-width: 560px) {
+  .has-sidebar .topbar { padding:8px 11px; }
+  .has-sidebar .topbar-user { display:none; }
+  .has-sidebar .container { padding:16px 12px 30px; }
+  .brand-bar { padding:10px 12px; }
+  .brand-nav { gap:6px; }
+  .brand-nav a, .brand-nav .nav-logout { min-height:38px; padding:7px 9px; font-size:12px; }
+  .page-header { margin:-16px -12px 17px; padding:21px 15px 18px; }
+  .page-header p, .page-heading p { font-size:13px; line-height:1.55; }
+  .card-header { padding:13px 14px; }
+  .card-body { padding:14px; }
+  .stats-row, .stats-row.three { grid-template-columns:minmax(0,1fr); }
+  .stat-card { padding:15px; }
+  .stat-value { font-size:23px; }
+  .btn, button.btn { width:auto; max-width:100%; }
+  .form-row > *, .filter-row > *, .toolbar > * { flex:1 1 100%; }
+  .form-control, input:not([type=checkbox]):not([type=radio]), select, textarea { font-size:16px; }
+  .table-wrap table { min-width:620px; }
+  .login-choice { width:calc(100% - 24px); margin:28px auto 38px; }
+  .login-choice-card { padding:19px; }
+  .footer { padding:18px 14px; text-align:center; }
+}
+
+@media (max-width: 380px) {
+  .has-sidebar .topbar-title { font-size:13px; }
+  .brand-mark { width:36px; height:36px; }
+  .brand-text { font-size:13px; }
+  .brand-text small { font-size:10px; }
+  .page-header h1, .page-heading h1 { font-size:21px; }
+  .card-body { padding:12px; }
+  .btn, button.btn { padding:9px 11px; font-size:12px; }
+  .table-wrap table { min-width:580px; }
+}
