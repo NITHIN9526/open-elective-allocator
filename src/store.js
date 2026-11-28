@@ -96,7 +96,7 @@ function removeLegacyDemoData(db) {
   db.departments ||= [];
   for (const reference of departments) {
     const existing = db.departments.find(dept => dept.code === reference.code);
-    if (existing && !Number.isFinite(existing.studentCount)) {
+    if (existing && existing.studentCount !== reference.studentCount) {
       existing.studentCount = reference.studentCount;
       changed = true;
     }
