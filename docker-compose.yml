@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: open-elective-portal
     init: true
     restart: unless-stopped
     ports:
