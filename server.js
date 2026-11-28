@@ -7,13 +7,18 @@ const bcrypt = require("bcryptjs");
 const config = require("./src/config");
 const { readDb, writeDb, seedDatabase, audit } = require("./src/store");
 const { requireAuth, requireStudent, requireAdmin, csrf } = require("./src/middleware");
-const { updateStudentProfile } = require("./src/googleSheets");
 
 seedDatabase(false);
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
-const SESSION_SECRET = process.env.SESSION_SECRET || "LOCAL-ONLY-CHANGE-ME-7d0c5f9b3a1e";
+const SESSION_SECRET = process.env.SESSION_SECRET || "";
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
+if (IS_PRODUCTION && SESSION_SECRET.length < 32) {
+  throw new Error("Production startup blocked: set SESSION_SECRET to a random value of at least 32 characters.");
+}
+
+app.set("trust proxy", IS_PRODUCTION ? 1 : false);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -24,7 +29,7 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: "lax", secure: false, maxAge: config.sessionMaxAgeMs }
+  cookie: { httpOnly: true, sameSite: "lax", secure: IS_PRODUCTION, maxAge: config.sessionMaxAgeMs }
 }));
 app.use(csrf);
 app.use((req, res, next) => {
@@ -299,34 +304,18 @@ app.post("/student/profile", requireStudent, loginLimiter, async (req, res) => {
     });
   }
 
-  try {
-    const sheetResult = await updateStudentProfile({
-      prn: student.prn, mobile, email, cgpa, semester, academicYear
-    });
+  Object.assign(student, {
+    mobile, email, cgpa, semester, academicYear,
+    profileCompleted: true,
+    profileUpdatedAt: new Date().toISOString()
+  });
 
-    student.mobile = mobile;
-    student.email = email;
-    student.cgpa = cgpa;
-    student.semester = semester;
-    student.academicYear = academicYear;
-    student.profileCompleted = true;
-    student.profileUpdatedAt = sheetResult.updatedAt;
+  audit(db, student.prn, "STUDENT_PROFILE_COMPLETED",
+    "Student profile saved in the portal database.");
+  writeDb(db);
 
-    audit(db, student.prn, "STUDENT_PROFILE_COMPLETED",
-      "Student profile saved and synchronized with Google Sheets.");
-    writeDb(db);
-
-    flash(req, "success", "Your profile has been saved and synchronized successfully.");
-    return res.redirect("/student");
-  } catch (err) {
-    console.error("Student profile synchronization failed:", err.message);
-    return res.status(502).render("student-profile", {
-      title: "Complete Student Profile",
-      student,
-      formData,
-      error: "We could not synchronize your profile with the student roster. Check that your PRN exists exactly once in the Students sheet, then try again."
-    });
-  }
+  flash(req, "success", "Your profile has been saved successfully.");
+  return res.redirect("/student");
 });
 
 app.post("/student/profile/request", requireStudent, requireCompletedProfile, loginLimiter, (req, res) => {
@@ -590,17 +579,15 @@ app.post("/admin/students/:prn/edit", requireAdmin, loginLimiter, async (req, re
   else if (!/^[1-6]$/.test(semesterInput)) error = "Semester must be between 1 and 6.";
   else if (!/^\d{4}-\d{2}$/.test(academicYear) || Number(academicYear.slice(5)) !== (Number(academicYear.slice(0,4))+1)%100) error = "Use academic year format YYYY-YY.";
   if (error) return res.status(400).render("admin-student-edit", { title: "Edit Student", student: { ...student, name, department, mobile, email, cgpa: cgpaInput, semester: semesterInput, academicYear }, departments: db.departments, error });
-  try {
-    const sheetResult = await updateStudentProfile({ prn: student.prn, name, department, mobile, email, cgpa, semester, academicYear });
-    Object.assign(student, { name, department, mobile, email, cgpa, semester, academicYear, profileCompleted: true, profileUpdatedAt: sheetResult.updatedAt });
-    audit(db, req.session.user.username, "ADMIN_STUDENT_PROFILE_EDITED", student.prn + " profile updated");
-    writeDb(db);
-    flash(req, "success", "Student record updated in the portal and Google Sheets.");
-    res.redirect("/admin/students");
-  } catch (err) {
-    console.error("Admin student update sync failed:", err.message);
-    return res.status(502).render("admin-student-edit", { title: "Edit Student", student, departments: db.departments, error: "Google Sheets update failed. No local changes were saved. Check the Students sheet headers and PRN." });
-  }
+  Object.assign(student, {
+    name, department, mobile, email, cgpa, semester, academicYear,
+    profileCompleted: true,
+    profileUpdatedAt: new Date().toISOString()
+  });
+  audit(db, req.session.user.username, "ADMIN_STUDENT_PROFILE_EDITED", student.prn + " profile updated");
+  writeDb(db);
+  flash(req, "success", "Student record updated successfully.");
+  res.redirect("/admin/students");
 });
 
 app.get("/admin/courses", requireAdmin, (req, res) => {
@@ -916,6 +903,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Open Elective demo running at http://localhost:${PORT}`);
-  console.log("Demo admin: username admin | password Admin@12345");
   console.log("Student demo password is created during registration.");
 });

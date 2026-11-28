@@ -47,10 +47,8 @@ services:
       PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER:-open_elective}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-open_elective}
       DATABASE_SSL: "false"
-      GOOGLE_SERVICE_ACCOUNT_KEY: /app/credentials/google-service-account.json
     volumes:
       - open_elective_data:/app/data
-      - ./credentials:/app/credentials:ro
     depends_on:
       db:
         condition: service_healthy
