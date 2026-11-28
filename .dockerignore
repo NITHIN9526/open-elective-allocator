@@ -11,4 +11,3 @@ data/*.json
 data/*.tmp
 coverage
 .DS_Store
-docker-compose*.yml
