@@ -6,12 +6,12 @@ const DATA_DIR = path.join(__dirname, "..", "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
 
 const defaultCourses = [
-  { id: "OE-CE-501", name: "Disaster Management", offeredBy: "CE", capacity: 65, description: "Semester 5 Open Elective" },
-  { id: "OE-ME-501", name: "Renewable Energy Technologies", offeredBy: "ME", capacity: 65, description: "Semester 5 Open Elective" },
-  { id: "OE-EL-501", name: "Concepts of IoT", offeredBy: "EL", capacity: 65, description: "Semester 5 Open Elective" },
-  { id: "OE-CM-501", name: "Introduction to IoT", offeredBy: "CM", capacity: 65, description: "Semester 5 Open Elective" },
-  { id: "OE-IE-501", name: "Mechatronics and Control", offeredBy: "IE", capacity: 65, description: "Semester 5 Open Elective" },
-  { id: "OE-EE-501", name: "Electric Vehicles & Traction", offeredBy: "EE", capacity: 65, description: "Semester 5 Open Elective" }
+  { id: "OE-CE-501", name: "Disaster Management", offeredBy: "CE", capacity: 65, description: "Open Elective" },
+  { id: "OE-ME-501", name: "Renewable Energy Technologies", offeredBy: "ME", capacity: 65, description: "Open Elective" },
+  { id: "OE-EL-501", name: "Concepts of IoT", offeredBy: "EL", capacity: 65, description: "Open Elective" },
+  { id: "OE-CM-501", name: "Introduction to IoT", offeredBy: "CM", capacity: 65, description: "Open Elective" },
+  { id: "OE-IE-501", name: "Mechatronics and Control", offeredBy: "IE", capacity: 65, description: "Open Elective" },
+  { id: "OE-EE-501", name: "Electric Vehicles & Traction", offeredBy: "EE", capacity: 65, description: "Open Elective" }
 ];
 
 const departments = [
@@ -46,7 +46,7 @@ function freshDb() {
   return {
     meta: {
       collegeName: "Government Polytechnic College, Palakkad",
-      semester: 5,
+      semester: 6,
       academicYear: "2026-27",
       preferencesOpen: false,
       allocationStatus: "NOT_STARTED"
@@ -81,7 +81,7 @@ function removeLegacyDemoData(db) {
     changed = true;
   }
 
-  // The six OE-*-501 records are the college's official default Semester 5 courses.
+  // The six OE-*-501 records are the college's official default open-elective courses.
   // Keep them during legacy cleanup; they are not fictional demo records.
   db.courses ||= [];
   for (const course of defaultCourses) {
