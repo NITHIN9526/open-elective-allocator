@@ -58,6 +58,10 @@ function freshDb() {
 function ensureDir() { fs.mkdirSync(DATA_DIR, { recursive: true }); }
 function removeLegacyDemoData(db) {
   let changed = false;
+  if (db.meta && Object.prototype.hasOwnProperty.call(db.meta, "portalMode")) {
+    delete db.meta.portalMode;
+    changed = true;
+  }
   const demoPrns = new Set((db.students || []).filter(student =>
     /^DEMO-/i.test(String(student.prn || ""))
   ).map(student => student.prn));
