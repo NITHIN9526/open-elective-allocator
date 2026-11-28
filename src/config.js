@@ -1,6 +1,6 @@
 module.exports = {
   collegeName: "Government Polytechnic College, Palakkad",
-  semester: 5,
+  semester: 6,
   academicYear: "2026-27",
   maxPreferences: 6,
   defaultCourseCapacity: 65,
