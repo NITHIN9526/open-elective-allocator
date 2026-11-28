@@ -11,6 +11,45 @@ A Node.js/Express and EJS development portal for the college open-elective proce
 - Docker Desktop or Docker Engine with Docker Compose, if using the container setup
 - A Google Cloud service account and Google Sheets API access, if profile synchronization is enabled
 
+## Fresh clone setup
+
+Clone the repository and install its dependencies:
+
+```powershell
+git clone https://github.com/NITHIN9526/open-elective-allocator.git
+cd open-elective-allocator
+npm ci
+```
+
+If you do not have a `package-lock.json` or are intentionally installing updated dependency versions, use `npm install` instead of `npm ci`.
+
+Create your local environment file from the example:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Open `.env` and set a unique `SESSION_SECRET` and the database settings required by your environment. For Google Sheets profile synchronization, also add `GOOGLE_SHEETS_ID` and `GOOGLE_SERVICE_ACCOUNT_KEY` as described in [Google Sheets integration](#google-sheets-integration). Do not commit `.env` or the real service-account JSON key.
+
+Start the development server:
+
+```powershell
+npm run dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000). See [Run locally](#run-locally), [Environment configuration](#environment-configuration), and [Google Sheets integration](#google-sheets-integration) for the remaining configuration details.
+
+## Available npm scripts
+
+| Command | Purpose |
+|---|---|
+| `npm start` | Start the portal with Node.js |
+| `npm run dev` | Start the portal with Node.js watch mode |
+| `npm run reset-demo` | Reset local demo data; destructive to local registrations and results |
+| `npm run db:migrate` | Run the database migration script |
+
+There is currently no automated test-suite command in `package.json`. Use the manual verification steps in [First-time setup and testing](#first-time-setup-and-testing) after making changes.
+
 ## Run locally
 
 From the project directory:
