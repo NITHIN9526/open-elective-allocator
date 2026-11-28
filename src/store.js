@@ -56,10 +56,56 @@ function freshDb() {
 }
 
 function ensureDir() { fs.mkdirSync(DATA_DIR, { recursive: true }); }
+function removeLegacyDemoData(db) {
+  let changed = false;
+  const demoPrns = new Set((db.students || []).filter(student =>
+    /^DEMO-/i.test(String(student.prn || ""))
+  ).map(student => student.prn));
+
+  if (demoPrns.size) {
+    db.students = (db.students || []).filter(student => !demoPrns.has(student.prn));
+    db.preferences = (db.preferences || []).filter(item => !demoPrns.has(item.prn));
+    db.allotments = (db.allotments || []).filter(item => !demoPrns.has(item.prn));
+    changed = true;
+  }
+
+  const demoCourseIds = new Set(["OE-CE-501", "OE-ME-501", "OE-EL-501", "OE-CM-501", "OE-IE-501", "OE-EE-501"]);
+  const beforeCourses = (db.courses || []).length;
+  db.courses = (db.courses || []).filter(course =>
+    !demoCourseIds.has(course.id) &&
+    !["Disaster Management", "Renewable Energy Technologies", "Concepts of IoT", "Introduction to IoT", "Mechatronics and Control", "Electric Vehicles & Traction"].includes(course.name)
+  );
+  if (db.courses.length !== beforeCourses) changed = true;
+
+  const beforeAdmins = (db.admins || []).length;
+  db.admins = (db.admins || []).filter(admin =>
+    !(String(admin.username).toLowerCase() === "admin" && admin.name === "Demo Administrator")
+  );
+  if (db.admins.length !== beforeAdmins) changed = true;
+
+  const beforeAudit = (db.audit || []).length;
+  db.audit = (db.audit || []).filter(entry =>
+    !(entry.action === "DEMO_DATABASE_INITIALIZED" || /seeded fictional demo records/i.test(entry.details || ""))
+  );
+  if (db.audit.length !== beforeAudit) changed = true;
+
+  if (!db.admins.length) {
+    const admins = initialAdmins();
+    if (admins.length) {
+      db.admins = admins;
+      changed = true;
+    }
+  }
+
+  return changed;
+}
+
 function readDb() {
   ensureDir();
   if (!fs.existsSync(DB_FILE)) seedDatabase(false);
-  return JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
+  const db = JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
+  if (removeLegacyDemoData(db)) writeDb(db);
+  return db;
 }
 function writeDb(db) {
   ensureDir();
