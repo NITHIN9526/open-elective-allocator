@@ -428,6 +428,7 @@ app.get("/admin", requireAdmin, (req, res) => {
     const seated = db.allotments.filter(a => a.courseId === course.id && ["PROPOSED","APPROVED"].includes(a.status)).length;
     return {
       id: course.id, name: course.name, offeredBy: course.offeredBy,
+      studentCount: (db.departments.find(dept => dept.code === course.offeredBy) || {}).studentCount || 0,
       capacity: course.capacity, totalPrefs: prefs.length,
       firstChoice: prefs.filter(p => p.rank === 1).length,
       seated, utilization: course.capacity > 0 ? Math.round((seated / course.capacity) * 100) : 0
