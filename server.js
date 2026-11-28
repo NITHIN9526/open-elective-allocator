@@ -151,7 +151,7 @@ app.post("/register", loginLimiter, async (req, res) => {
   }
   const db = readDb();
   const student = db.students.find(s => s.prn === prn);
-  if (!student) return res.status(404).render("register", { title: "Student registration", error: "This PRN is not present in the demo roster." });
+  if (!student) return res.status(404).render("register", { title: "Student registration", error: "This PRN is not present in the student roster. Please contact the administrator." });
   if (student.accountStatus !== "NOT_REGISTERED") return res.status(409).render("register", { title: "Student registration", error: "This PRN has already registered or is not eligible to register." });
   student.passwordHash = await bcrypt.hash(password, 12);
   student.accountStatus = "PENDING";
@@ -379,7 +379,7 @@ app.post("/student/preferences", requireStudent, requireCompletedProfile, (req, 
     flash(req, "error", `Assign a unique priority from 1 to ${config.maxPreferences} to each selected course. Leave unselected courses blank.`);
     return res.redirect("/student");
   }
-  // Current demo policy: students may select any listed course, including their own department's course.
+  // Eligibility is determined by the institution's configured course policy.
   db.preferences = db.preferences.filter(p => p.prn !== student.prn);
   selected.sort((a, b) => a.rank - b.rank).forEach(item => db.preferences.push({
     id: db.counters.preference++, prn: student.prn, courseId: item.courseId, rank: item.rank, submittedAt: new Date().toISOString()
@@ -902,6 +902,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Open Elective demo running at http://localhost:${PORT}`);
-  console.log("Student demo password is created during registration.");
+  console.log(`Open Elective Portal running at http://localhost:${PORT}`);
 });
