@@ -1,0 +1,100 @@
+<%- include("partials/header", { title }) %>
+
+<div class="heading-row">
+  <div class="page-heading">
+    <span class="eyebrow">ADMINISTRATION</span>
+    <h1>Student Data Import & Export</h1>
+    <p class="text-muted">Import the official student roster and export portal records for reports.</p>
+  </div>
+  <a class="btn btn-secondary" href="/admin/students">View student list</a>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card"><span>Total students</span><strong><%= stats.total %></strong></div>
+  <div class="stat-card"><span>Departments</span><strong><%= stats.departments %></strong></div>
+  <div class="stat-card"><span>Pending accounts</span><strong><%= stats.pending %></strong></div>
+</div>
+
+<div class="grid-2">
+  <section class="card">
+    <div class="card-header"><h2>Import student records</h2></div>
+    <div class="card-body">
+      <p class="text-muted">Upload an Excel or CSV file. The first worksheet is used for Excel workbooks.</p>
+      <form method="post" action="/admin/student-data/preview" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label for="studentFile">Student file (.xlsx, .xls, .csv)</label>
+        <input id="studentFile" name="studentFile" type="file" accept=".xlsx,.xls,.csv" required>
+        <p class="form-hint">Maximum file size: 5 MB. Required columns: PRN, Student_Name (or Name), and Department or Dept_Code.</p>
+        <button class="btn btn-primary" type="submit">Upload and preview</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header"><h2>Export student records</h2></div>
+    <div class="card-body">
+      <p class="text-muted">Download student details, account status, preferences and allocation status. Passwords and password hashes are never exported.</p>
+      <form method="get" action="/admin/student-data/export">
+        <label for="department">Department</label>
+        <select id="department" name="department">
+          <option value="">All departments</option>
+          <% departments.forEach(dept => { %><option value="<%= dept.code %>"><%= dept.name %></option><% }) %>
+        </select>
+        <label for="status">Account status</label>
+        <select id="status" name="status">
+          <option value="">All statuses</option>
+          <option value="NOT_REGISTERED">Not registered</option>
+          <option value="PENDING">Pending</option>
+          <option value="ACTIVE">Active</option>
+          <option value="REJECTED">Rejected</option>
+        </select>
+        <label for="format">File format</label>
+        <select id="format" name="format">
+          <option value="xlsx">Excel (.xlsx)</option>
+          <option value="csv">CSV (.csv)</option>
+        </select>
+        <button class="btn btn-primary" type="submit">Download export</button>
+      </form>
+    </div>
+  </section>
+</div>
+
+<% if (error) { %><div class="alert error"><%= error %></div><% } %>
+<% if (preview) { %>
+<section class="card">
+  <div class="card-header"><h2>Import preview</h2><span class="badge badge-info"><%= preview.fileName %></span></div>
+  <div class="card-body">
+    <div class="stats-grid">
+      <div class="stat-card"><span>Rows read</span><strong><%= preview.total %></strong></div>
+      <div class="stat-card"><span>Valid rows</span><strong><%= preview.valid.length %></strong></div>
+      <div class="stat-card"><span>New students</span><strong><%= preview.valid.filter(r => !r.existing).length %></strong></div>
+      <div class="stat-card"><span>Existing records</span><strong><%= preview.valid.filter(r => r.existing).length %></strong></div>
+      <div class="stat-card"><span>Invalid rows</span><strong><%= preview.errors.length %></strong></div>
+    </div>
+    <p class="text-muted">Existing records will have roster fields updated. Existing passwords, account approvals, preferences and allocations will be preserved. Invalid rows will be skipped.</p>
+    <% if (preview.errors.length) { %>
+    <h3>Rows requiring correction</h3>
+    <div class="table-wrap"><table><thead><tr><th>Excel row</th><th>PRN</th><th>Issue</th></tr></thead><tbody>
+      <% preview.errors.slice(0, 100).forEach(item => { %><tr><td><%= item.row %></td><td><%= item.prn %></td><td><%= item.errors %></td></tr><% }) %>
+    </tbody></table></div>
+    <% if (preview.errors.length > 100) { %><p class="form-hint">Showing first 100 of <%= preview.errors.length %> invalid rows.</p><% } %>
+    <% } %>
+    <h3>Valid student preview</h3>
+    <div class="table-wrap"><table><thead><tr><th>PRN</th><th>Name</th><th>Department</th><th>Record</th></tr></thead><tbody>
+      <% preview.valid.slice(0, 20).forEach(item => { %><tr><td><%= item.prn %></td><td><%= item.name %></td><td><%= item.department %></td><td><%= item.existing ? "Update existing" : "New student" %></td></tr><% }) %>
+    </tbody></table></div>
+    <% if (preview.valid.length > 20) { %><p class="form-hint">Showing first 20 of <%= preview.valid.length %> valid rows.</p><% } %>
+    <div class="button-row">
+      <form method="post" action="/admin/student-data/confirm">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-primary" type="submit" <%= preview.valid.length ? "" : "disabled" %>>Confirm import (<%= preview.valid.length %>)</button>
+      </form>
+      <form method="post" action="/admin/student-data/cancel">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-secondary" type="submit">Cancel import</button>
+      </form>
+    </div>
+  </div>
+</section>
+<% } %>
+<%- include("partials/footer") %>

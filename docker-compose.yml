@@ -1,4 +1,37 @@
 services:
+  db:
+    image: postgres:16-alpine
+    container_name: open-elective-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-open_elective}
+      POSTGRES_USER: ${POSTGRES_USER:-open_elective}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-open_elective} -d ${POSTGRES_DB:-open_elective}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: open-elective-migrations
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-open_elective}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-open_elective}
+      DATABASE_SSL: "false"
+    command: ["npm", "run", "db:migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
   open-elective:
     build:
       context: .
@@ -6,14 +39,22 @@ services:
     container_name: open-elective-portal
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${APP_PORT:-3000}:3000"
     env_file:
       - .env
     environment:
       NODE_ENV: production
       PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-open_elective}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-open_elective}
+      DATABASE_SSL: "false"
     volumes:
       - open_elective_data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
 volumes:
+  postgres_data:
   open_elective_data:
