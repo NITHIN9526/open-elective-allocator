@@ -328,13 +328,6 @@ td small { display: block; color: var(--gray-400); font-size: 11px; margin-top: 
 .auth-card form { margin-top: 28px; }
 .auth-bottom { text-align: center; margin-top: 24px; font-size: 13px; color: var(--gray-500); }
 .auth-bottom a { color: var(--primary-600); font-weight: 600; }
-.demo-box {
-  margin-top: 24px; padding: 14px 16px; background: var(--gray-50); border: 1px solid var(--gray-200);
-  border-radius: var(--radius-sm); font-size: 12px; line-height: 1.8; color: var(--gray-500);
-}
-.demo-box strong { color: var(--gray-700); }
-.demo-box code { background: var(--primary-50); color: var(--primary-700); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
-
 /* --- Student Course Grid --- */
 .course-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 .course-card {
